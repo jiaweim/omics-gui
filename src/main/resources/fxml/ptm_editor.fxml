@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<fx:root dividerPositions="0.5" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="800.0" type="javafx.scene.control.SplitPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <items>
+        <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <center>
+                <TableView fx:id="ptmTableNode" BorderPane.alignment="CENTER" />
+            </center>
+            <padding>
+                <Insets bottom="2.0" left="2.0" />
+            </padding>
+        </BorderPane>
+        <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="25.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="35.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints maxHeight="36.0" minHeight="36.0" prefHeight="36.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Label text="Name" GridPane.rowIndex="1" />
+                <Label text="Description" GridPane.rowIndex="2" />
+                <TextField fx:id="nameNode" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                <TextField fx:id="descriptionNode" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                <Label text="Composition" GridPane.rowIndex="3" />
+                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                    <children>
+                        <TextField fx:id="compositionNode" promptText="Double click to edit" />
+                        <Label fx:id="massNode" />
+                    </children>
+                </HBox>
+                <Label text="Specificities" GridPane.rowIndex="4" />
+                <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#delSpecificity" prefWidth="56.0" text="Delete" />
+                  <Button mnemonicParsing="false" onAction="#addSpecificity" prefWidth="56.0" text="Add" />
+               </children></HBox>
+                <TableView fx:id="specificityTable" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="3" GridPane.rowIndex="6" />
+                <FlowPane alignment="CENTER" hgap="6.0" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="3">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#newPTM" prefWidth="56.0" text="New" />
+                        <Button mnemonicParsing="false" onAction="#delPTM" prefWidth="56.0" text="Delete" />
+                        <Button mnemonicParsing="false" onAction="#addPTM" prefWidth="56.0" text="Add" />
+                  <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#savePTM" prefWidth="56.0" text="Save" />
+                  <Button mnemonicParsing="false" onAction="#savePTMToFile" prefWidth="56.0" text="SaveTo" />
+                    </children>
+                </FlowPane>
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="3.0" GridPane.columnSpan="3" GridPane.rowIndex="5">
+               <children>
+                  <ChoiceBox fx:id="spAANode" minWidth="56.0" />
+                  <ChoiceBox fx:id="spPosNode" minWidth="56.0" />
+                  <TextField fx:id="spNLNameNode" promptText="NeutralLoss Name" />
+                  <TextField fx:id="spNLShortNameNode" promptText="Short Name" />
+                  <TextField fx:id="spNLCompositionNode" promptText="Composition" />
+               </children>
+            </HBox>
+            </children>
+            <padding>
+                <Insets bottom="2.0" left="2.0" right="2.0" />
+            </padding>
+        </GridPane>
+    </items>
+</fx:root>

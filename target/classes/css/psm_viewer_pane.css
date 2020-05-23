@@ -1,0 +1,6 @@
+.tab-pane{
+    -fx-tab-min-width: 60px;
+}
+.split-pane > .split-pane-divider{
+    -fx-padding: 0 1 0 1;
+}

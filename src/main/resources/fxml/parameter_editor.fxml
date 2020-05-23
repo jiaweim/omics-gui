@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.textfield.TextFields?>
+
+<fx:root prefHeight="800.0" prefWidth="800.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+     <children>
+            <HBox alignment="CENTER" minHeight="40.0" prefHeight="40.0" spacing="6.0">
+                <children>
+                    <Label text="Parameter File" />
+                    <TextField fx:id="editParameterNode" prefWidth="360.0" />
+                    <Button fx:id="saveButton" mnemonicParsing="false" />
+                    <Button fx:id="openButton" mnemonicParsing="false" />
+                </children>
+            </HBox>
+            <TitledPane animated="false" text="Protein Digestion">
+                <content>
+                    <GridPane hgap="6.0" vgap="3.0">
+                        <columnConstraints>
+                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" percentWidth="15.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="10.0" />
+                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" percentWidth="15.0" />
+                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" percentWidth="10.0" />
+                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" percentWidth="20.0" />
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="30.0" />
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        </rowConstraints>
+                        <children>
+                            <Label text="Enzyme" GridPane.rowIndex="1" />
+                            <ChoiceBox fx:id="enzymeNode" prefWidth="88.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            <CheckBox fx:id="nMChoose" mnemonicParsing="false" selected="true" text="Clip Protein N-Term M" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                            <Label text="Missed Cleavage" GridPane.rowIndex="2" />
+                            <ChoiceBox fx:id="missedCleavageNode" prefWidth="88.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                            <Label text="Cleavage" GridPane.rowIndex="3" />
+                            <ChoiceBox fx:id="cleavageModeNode" prefWidth="88.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                            <HBox alignment="CENTER_LEFT" spacing="4.0" GridPane.columnIndex="5" GridPane.rowIndex="2">
+                                <children>
+                                    <Spinner fx:id="minLenNode" editable="true" prefWidth="66.0" />
+                                    <Spinner fx:id="maxLenNode" editable="true" prefWidth="66.0" />
+                                </children>
+                            </HBox>
+                            <Label text="Peptide Length" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                            <Label text="Dual Enzyme" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                            <Label text="Missed Cleavage" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                            <Label text="Cleavage" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                            <ChoiceBox fx:id="enzymeNode2" prefWidth="88.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                            <ChoiceBox fx:id="missedCleavageNode2" prefWidth="88.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                            <ChoiceBox fx:id="cleavageModeNode2" prefWidth="88.0" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                            <Label text="Fasta File" />
+                            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.columnSpan="4">
+                                <children>
+                                    <TextField fx:id="fastaField" prefWidth="300.0" />
+                                    <Button fx:id="chooseFastaButton" mnemonicParsing="false" textAlignment="CENTER" />
+                                </children>
+                            </HBox>
+                              <CheckBox fx:id="searchDecoyCheck" mnemonicParsing="false" selected="true" text="Search Decoy" GridPane.columnIndex="5" />
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="4.0" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                     <children>
+                                  <Label text="Max Isoform" />
+                                  <ComboBox fx:id="isoformNode" editable="true" prefWidth="66.0" />
+                        <Label text="Max Modification" />
+                        <ComboBox fx:id="maxModNode" editable="true" prefWidth="66.0" />
+                     </children>
+                  </HBox>
+                        </children>
+                    </GridPane>
+                </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Peak Matching">
+                <content>
+                    <GridPane hgap="6.0" vgap="3.0">
+                        <columnConstraints>
+                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" percentWidth="16.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="10.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="10.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="10.0" />
+                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" percentWidth="16.0" />
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="38.0" />
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        </rowConstraints>
+                        <children>
+                            <Label text="Precursor Tolerance" />
+                            <ComboBox fx:id="leftTolNode" editable="true" prefWidth="88.0" GridPane.columnIndex="1" />
+                            <ComboBox fx:id="rightTolNode" editable="true" prefWidth="88.0" visibleRowCount="3" GridPane.columnIndex="2" />
+                            <ChoiceBox fx:id="parentUnitBox" prefWidth="88.0" GridPane.columnIndex="3" />
+                            <Label text="Fragment Tolerance" GridPane.rowIndex="1" />
+                            <ComboBox fx:id="leftFragTolNode" editable="true" prefWidth="88.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            <ComboBox fx:id="rightFragNode" editable="true" prefWidth="88.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                            <ChoiceBox fx:id="fragUnitNode" prefWidth="88.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                            <Label text="Isotope Error" GridPane.rowIndex="2" />
+                            <Spinner fx:id="minIso" prefWidth="88.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                            <Spinner fx:id="maxIso" prefWidth="88.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                            <Label text="Precursor Charge" GridPane.rowIndex="3" />
+                            <Spinner fx:id="minChargeNode" editable="true" prefWidth="88.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                            <Spinner fx:id="maxChargeNode" editable="true" prefWidth="88.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                            <Label text="Instrument" GridPane.columnIndex="4" />
+                            <ChoiceBox fx:id="instruNode" prefWidth="150.0" GridPane.columnIndex="5" />
+                            <Label text="Activation" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                            <ChoiceBox fx:id="activationNode" prefWidth="150.0" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                            <Label text="Protocol" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                            <ChoiceBox fx:id="protocolNode" prefWidth="150.0" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                            <Label text="Charge Carrer" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                            <ChoiceBox fx:id="carrerMassNode" prefWidth="150.0" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+                            <Label text="Min Denovo" GridPane.rowIndex="5" />
+                            <ComboBox fx:id="minDenovoNode" editable="true" prefWidth="88.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                            <Label text="Top N" GridPane.rowIndex="4" />
+                            <ComboBox fx:id="topN" editable="true" prefWidth="88.0" visibleRowCount="3" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="4">
+                       <children>
+                          <CheckBox fx:id="clearBButton" mnemonicParsing="false" prefWidth="100.0" text="Clear B-ion" />
+                          <CheckBox fx:id="clearYButton" mnemonicParsing="false" prefWidth="100.0" text="Clear Y-ion" />
+                                  <Label text="Min Peaks" />
+                                  <ComboBox fx:id="minPeakNode" editable="true" prefWidth="66.0" visibleRowCount="3" />
+                       </children>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="5">
+                       <children>
+                                  <CheckBox fx:id="moreFeaturesNode" mnemonicParsing="false" prefWidth="100.0" selected="true" text="More Features" />
+                                  <CheckBox fx:id="preferDeltaNode" mnemonicParsing="false" prefWidth="100.0" selected="true" text="Prefer Delta" />
+                       </children>
+                    </HBox>
+                        </children>
+                    </GridPane>
+                </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Modifications">
+                <content>
+                    <GridPane hgap="6.0" vgap="3.0">
+                        <columnConstraints>
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" percentWidth="46.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" percentWidth="8.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" percentWidth="46.0" />
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints minHeight="24.0" prefHeight="24.0" vgrow="SOMETIMES" />
+                            <RowConstraints percentHeight="40.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="24.0" prefHeight="24.0" vgrow="SOMETIMES" />
+                            <RowConstraints percentHeight="40.0" vgrow="SOMETIMES" />
+                        </rowConstraints>
+                        <children>
+                            <ListView fx:id="variableModificationNode" GridPane.rowIndex="1" />
+                            <ListView fx:id="fixedModificationNode" GridPane.rowIndex="3" />
+                            <Label text="Variable Modifications">
+                             <font>
+                                <Font name="System Bold" size="12.0" />
+                             </font>
+                            </Label>
+                            <Label text="Fixed Modifications" GridPane.rowIndex="2">
+                                <font>
+                                    <Font name="System Bold" size="12.0" />
+                                </font>
+                            </Label>
+                            <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <children>
+                                    <Button mnemonicParsing="false" onAction="#removeVariableMod" prefWidth="36.0" text="&gt;" />
+                                    <Button mnemonicParsing="false" onAction="#addVariableMod" prefWidth="36.0" text="&lt;" />
+                                </children>
+                            </VBox>
+                            <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                <children>
+                                    <Button mnemonicParsing="false" onAction="#removeFixedMod" prefWidth="36.0" text="&gt;" />
+                                    <Button mnemonicParsing="false" onAction="#addFixedMod" prefWidth="36.0" text="&lt;" />
+                                </children>
+                            </VBox>
+                            <ListView fx:id="ptmListNode" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="3" />
+                  <BorderPane GridPane.columnIndex="2">
+                     <right>
+                        <Button fx:id="refreshPTMButton" mnemonicParsing="false" BorderPane.alignment="CENTER" />
+                     </right>
+                     <left>
+                         <Label text="Modifications" BorderPane.alignment="CENTER">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                         </Label>
+                     </left>
+                      <center>
+                          <TextFields fx:id="filterPTMNode" fx:factory="createClearableTextField" />
+                      </center>
+                  </BorderPane>
+                        </children>
+                    </GridPane>
+                </content>
+            </TitledPane>
+        <TitledPane animated="false" collapsible="false" text="Deltas" VBox.vgrow="ALWAYS">
+           <content>
+              <GridPane hgap="6.0" vgap="3.0">
+                <columnConstraints>
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" percentWidth="46.0" />
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" percentWidth="8.0" />
+                  <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" percentWidth="46.0" />
+                </columnConstraints>
+                <rowConstraints>
+                  <RowConstraints minHeight="24.0" prefHeight="24.0" vgrow="NEVER" />
+                  <RowConstraints vgrow="ALWAYS" />
+                </rowConstraints>
+                 <children>
+                    <Label text="Selected Delta Entries" />
+                            <ListView fx:id="deltaList4Search" GridPane.rowIndex="1" />
+                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                       <children>
+                          <Button mnemonicParsing="false" onAction="#removeDelta" prefWidth="36.0" text="&gt;" />
+                          <Button mnemonicParsing="false" onAction="#selectDelta" prefWidth="36.0" text="&lt;" />
+                       </children>
+                    </VBox>
+                    <ListView fx:id="deltaListNode" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    <BorderPane GridPane.columnIndex="2">
+                       <left>
+                          <Label text="Delta Entries" BorderPane.alignment="CENTER">
+                              <font>
+                                  <Font name="System Bold" size="12.0"/>
+                              </font>
+                          </Label>
+                       </left>
+                        <center>
+                            <TextFields fx:id="filterDeltaNode" fx:factory="createClearableTextField" />
+                        </center>
+                       <right>
+                          <Button fx:id="refreshDeltaListButton" mnemonicParsing="false" BorderPane.alignment="CENTER" />
+                       </right>
+                    </BorderPane>
+                 </children>
+              </GridPane>
+           </content>
+        </TitledPane>
+     </children>
+</fx:root>

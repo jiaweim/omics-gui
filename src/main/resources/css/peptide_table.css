@@ -1,0 +1,30 @@
+.aa{
+    -fx-alignment: center;
+    -fx-font: normal bold 14px "serif";
+    -fx-width: 80;
+}
+
+.mz{
+    -fx-alignment: center-right;
+    -fx-font-family: "Times New Roman";
+    -fx-font-size: 14px;
+    -fx-font-style: normal;
+    -fx-font-weight: 600;
+}
+
+.match-mz{
+    -fx-font-weight: bold;
+}
+
+.b{
+    -fx-text-fill: teal;
+}
+
+.y{
+    -fx-text-fill: darkred;
+}
+
+.table-view .column-header .label{
+    -fx-font-size: 10pt;
+    -fx-font-weight: 700;
+}
