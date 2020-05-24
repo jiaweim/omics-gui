@@ -6,11 +6,11 @@
     <parent>
         <groupId>omics</groupId>
         <artifactId>omics</artifactId>
-        <version>1.5.0</version>
+        <version>1.6.0</version>
     </parent>
 
     <artifactId>omics-gui</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 
     <dependencies>
         <dependency>
