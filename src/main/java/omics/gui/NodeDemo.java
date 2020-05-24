@@ -5,9 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import omics.gui.control.FormulaEditor;
-import omics.gui.control.PTMEditor;
-import omics.gui.control.ParameterPane;
+import omics.gui.control.ToolBox;
 
 /**
  * @author JiaweiMao
@@ -25,9 +23,7 @@ public class NodeDemo extends Application
     public void start(Stage primaryStage)
     {
         BorderPane root = new BorderPane();
-        root.setCenter(new ParameterPane());
-        HBox bottom = new HBox(1);
-        root.setBottom(bottom);
+        root.setCenter(new ToolBox());
 
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
