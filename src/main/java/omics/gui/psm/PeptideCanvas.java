@@ -11,7 +11,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import omics.gui.psm.util.NodeUtils;
 import omics.util.protein.Peptide;
-import omics.util.protein.ms.FragmentIonType;
+import omics.util.protein.ms.Ion;
 import omics.util.protein.ms.PeptideFragAnnotation;
 
 import java.util.ArrayList;
@@ -106,18 +106,18 @@ public class PeptideCanvas extends Canvas
         double labelXLoc, labelYLoc;
         String label;
 
-        ListMultimap<FragmentIonType, PeptideFragAnnotation> annoMap = ArrayListMultimap.create();
+        ListMultimap<Ion, PeptideFragAnnotation> annoMap = ArrayListMultimap.create();
         for (PeptideFragAnnotation annotation : annotations) {
-            annoMap.put(annotation.getFragmentIonType(), annotation);
+            annoMap.put(annotation.getIon(), annotation);
         }
 
         Set<Integer> processedSet = new HashSet<>();
-        if (annoMap.containsKey(FragmentIonType.b)) {
-            List<PeptideFragAnnotation> annotations = annoMap.get(FragmentIonType.b);
+        if (annoMap.containsKey(Ion.b)) {
+            List<PeptideFragAnnotation> annotations = annoMap.get(Ion.b);
 
             gc.setTextBaseline(VPos.TOP);
-            gc.setStroke(config.getColor(FragmentIonType.b));
-            gc.setFill(config.getColor(FragmentIonType.b));
+            gc.setStroke(config.getColor(Ion.b));
+            gc.setFill(config.getColor(Ion.b));
 
             for (PeptideFragAnnotation annotation : annotations) {
                 int len = annotation.getFragment().size();
@@ -143,12 +143,12 @@ public class PeptideCanvas extends Canvas
         }
 
         processedSet.clear();
-        if (annoMap.containsKey(FragmentIonType.y)) {
-            List<PeptideFragAnnotation> annotations = annoMap.get(FragmentIonType.y);
+        if (annoMap.containsKey(Ion.y)) {
+            List<PeptideFragAnnotation> annotations = annoMap.get(Ion.y);
 
             gc.setTextBaseline(VPos.BOTTOM);
-            gc.setStroke(config.getColor(FragmentIonType.y));
-            gc.setFill(config.getColor(FragmentIonType.y));
+            gc.setStroke(config.getColor(Ion.y));
+            gc.setFill(config.getColor(Ion.y));
 
             for (PeptideFragAnnotation annotation : annotations) {
                 int len = annotation.getFragment().size();

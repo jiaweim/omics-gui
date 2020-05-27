@@ -2,6 +2,7 @@ package omics.gui.util;
 
 import omics.util.utils.Pair;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,6 +20,11 @@ public class IntegerStringConverterV2 extends AbstractStringConverter<Integer>
     public IntegerStringConverterV2()
     {
         super();
+    }
+
+    public IntegerStringConverterV2(String name, Integer value)
+    {
+        this(Collections.singletonList(Pair.create(name, value)));
     }
 
     /**

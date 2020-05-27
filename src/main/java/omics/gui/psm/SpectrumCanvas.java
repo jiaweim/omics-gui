@@ -336,7 +336,7 @@ public class SpectrumCanvas extends Canvas
                 Color color = Color_DefaultAnno;
                 if (annotation instanceof PeptideFragAnnotation) {
                     PeptideFragAnnotation fragAnnotation = (PeptideFragAnnotation) annotation;
-                    color = config.getColor(fragAnnotation.getFragmentIonType());
+                    color = config.getColor(fragAnnotation.getIon());
                 }
 
                 gc.setStroke(color);

@@ -643,7 +643,7 @@ public class SpectrumChart extends Pane
 
             List<? extends PeakAnnotation> annotations = peakList.getAnnotations(i);
             PeakAnnotation annotation = annotations.get(0);
-            Color color = config.getColor(annotation.getFragmentIonType());
+            Color color = config.getColor(annotation.getIon());
             if (color == null)
                 color = config.getPeakColor();
 

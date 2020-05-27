@@ -33,7 +33,6 @@ public class IntegerEditor extends HBox implements ParameterEditor<Integer>
         getChildren().add(control);
     }
 
-
     @Override
     public Node getEditor()
     {

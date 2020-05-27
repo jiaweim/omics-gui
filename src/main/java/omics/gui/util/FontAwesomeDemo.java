@@ -7,6 +7,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
 
@@ -26,7 +27,10 @@ public class FontAwesomeDemo extends Application
         for (FontAwesome.Glyph glyph : FontAwesome.Glyph.values()) {
             Button button = new Button();
             button.setText(glyph.name());
-            button.setGraphic(fontAwesome.create(glyph));
+            Glyph icon = fontAwesome.create(glyph);
+            System.out.println(icon.getFontSize());
+            button.setGraphic(icon);
+//            button.setPrefHeight(20);
             listView.getItems().add(button);
         }
         root.getChildren().add(listView);

@@ -40,7 +40,6 @@ public class SearchWindow extends Application
 
         SearchController controller = loader.getController();
         controller.setMainWindow(primaryStage);
-
         Scene scene = new Scene(root);
 //        scene.getStylesheets().add("css/omics_main.css");
         primaryStage.setScene(scene);

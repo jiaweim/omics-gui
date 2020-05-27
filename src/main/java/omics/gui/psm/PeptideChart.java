@@ -10,7 +10,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import omics.util.protein.Peptide;
-import omics.util.protein.ms.FragmentIonType;
+import omics.util.protein.ms.Ion;
 import omics.util.protein.ms.PeptideFragAnnotation;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class PeptideChart extends Pane
 
     private static final int LINE_WIDTH = 2;
     private Peptide peptide;
-    private List<PeptideFragAnnotation> annotations = new ArrayList<>();
+    private final List<PeptideFragAnnotation> annotations = new ArrayList<>();
     private SpectrumViewStyle config = new SpectrumViewStyle();
 
     public PeptideChart()
@@ -121,15 +121,15 @@ public class PeptideChart extends Pane
         if (annotations.isEmpty())
             return;
 
-        ListMultimap<FragmentIonType, PeptideFragAnnotation> annotationMap = ArrayListMultimap.create();
+        ListMultimap<Ion, PeptideFragAnnotation> annotationMap = ArrayListMultimap.create();
         for (PeptideFragAnnotation annotation : annotations) {
-            annotationMap.put(annotation.getFragmentIonType(), annotation);
+            annotationMap.put(annotation.getIon(), annotation);
         }
 
         Set<Integer> processedSet = new HashSet<>();
         //region PeptideIonType.b
-        if (annotationMap.containsKey(FragmentIonType.b)) {
-            List<PeptideFragAnnotation> annotations = annotationMap.get(FragmentIonType.b);
+        if (annotationMap.containsKey(Ion.b)) {
+            List<PeptideFragAnnotation> annotations = annotationMap.get(Ion.b);
 
             for (PeptideFragAnnotation annotation : annotations) {
 
@@ -143,7 +143,7 @@ public class PeptideChart extends Pane
                 double y3 = y_aa + aaHeight / 2;
 
                 Polyline polyline = new Polyline((int) x1, (int) y1, (int) x2, (int) y1, (int) x2, (int) y3);
-                polyline.setStroke(config.getColor(FragmentIonType.b));
+                polyline.setStroke(config.getColor(Ion.b));
                 polyline.setStrokeWidth(LINE_WIDTH);
                 getChildren().add(polyline);
 
@@ -152,7 +152,7 @@ public class PeptideChart extends Pane
                 Text labelTxt = new Text(label);
                 labelTxt.setFont(config.getAminoAcidLabelFont());
                 labelTxt.setTextOrigin(VPos.TOP);
-                labelTxt.setFill(config.getColor(FragmentIonType.b));
+                labelTxt.setFill(config.getColor(Ion.b));
                 labelTxt.relocate(x1, y1 + PAD_VLine_Label);
                 getChildren().add(labelTxt);
 
@@ -162,8 +162,8 @@ public class PeptideChart extends Pane
         //endregion
 
         processedSet.clear();
-        if (annotationMap.containsKey(FragmentIonType.y)) {
-            List<PeptideFragAnnotation> annotations = annotationMap.get(FragmentIonType.y);
+        if (annotationMap.containsKey(Ion.y)) {
+            List<PeptideFragAnnotation> annotations = annotationMap.get(Ion.y);
 
             for (PeptideFragAnnotation annotation : annotations) {
 
@@ -177,7 +177,7 @@ public class PeptideChart extends Pane
                 double y2 = y_aa - PAD_AA_VLine;
 
                 Polyline polyline = new Polyline((int) x1, (int) y1, (int) x1, (int) y2, (int) x3, (int) y2);
-                polyline.setStroke(config.getColor(FragmentIonType.y));
+                polyline.setStroke(config.getColor(Ion.y));
                 polyline.setStrokeWidth(LINE_WIDTH);
                 getChildren().add(polyline);
 
@@ -186,7 +186,7 @@ public class PeptideChart extends Pane
                 Text labelTxt = new Text(label);
                 labelTxt.setFont(config.getAminoAcidLabelFont());
                 labelTxt.setTextOrigin(VPos.TOP);
-                labelTxt.setFill(config.getColor(FragmentIonType.y));
+                labelTxt.setFill(config.getColor(Ion.y));
                 labelTxt.relocate(x1, y2 - PAD_VLine_Label - labelTxt.getBoundsInLocal().getHeight());
 
                 getChildren().add(labelTxt);

@@ -12,8 +12,8 @@ import javafx.scene.control.cell.MapValueFactory;
 import javafx.util.Callback;
 import omics.util.protein.Peptide;
 import omics.util.protein.PeptideFragment;
-import omics.util.protein.ms.FragmentIonType;
 import omics.util.protein.ms.FragmentType;
+import omics.util.protein.ms.Ion;
 import omics.util.protein.ms.PeptideFragAnnotation;
 import omics.util.protein.ms.PeptideSpectrum;
 import omics.util.utils.NumberFormatFactory;
@@ -113,20 +113,20 @@ public class PeptideTableView extends TableView
         }
 
         // table for FragmentIonType, index, column title
-        Table<FragmentIonType, Integer, String> idTable = HashBasedTable.create();
+        Table<Ion, Integer, String> idTable = HashBasedTable.create();
 
         Set<String> labels = new HashSet<>(); // all labels include delta mass
         //<editor-fold desc="populate value to map">
         for (int i = 0; i < iSpectrum.size(); i++) {
             for (PeptideFragAnnotation annotation : iSpectrum.getAnnotations(i)) {
-                FragmentIonType peptideIonType = annotation.getFragmentIonType();
+                Ion peptideIonType = annotation.getIon();
 
                 // neutral Loss is not supported
                 if (annotation.hasNeutralLoss()) {
                     continue;
                 }
 
-                if (peptideIonType == FragmentIonType.p)
+                if (peptideIonType == Ion.p)
                     continue;
                 PeptideFragment fragment = annotation.getFragment();
                 int size = fragment.size();
@@ -178,8 +178,8 @@ public class PeptideTableView extends TableView
 
         getColumns().add(forwardIdCol);
 
-        List<FragmentIonType> types = new ArrayList<>(idTable.rowKeySet());
-        types.sort(Comparator.comparing(FragmentIonType::getName));
+        List<Ion> types = new ArrayList<>(idTable.rowKeySet());
+        types.sort(Comparator.comparing(Ion::getName));
 
         TableColumn<Map, String> seqCol = new TableColumn<>("");
         TableColumn<Map, String> seqValueCol = new TableColumn<>("Seq.");
@@ -189,7 +189,7 @@ public class PeptideTableView extends TableView
         seqCol.getColumns().add(seqValueCol);
 
         boolean firstReverse = true;
-        for (FragmentIonType ionType : types) {
+        for (Ion ionType : types) {
             if (ionType.getFragmentType() == FragmentType.REVERSE && firstReverse) {
                 getColumns().add(seqCol);
                 firstReverse = false;

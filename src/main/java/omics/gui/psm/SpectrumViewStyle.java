@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import omics.pdk.ptm.glycosylation.util.SNFGShape;
-import omics.util.protein.ms.FragmentIonType;
+import omics.util.protein.ms.Ion;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,9 +17,10 @@ import java.util.Map;
  * @version 1.1.0
  * @since 19 Jul 2018, 5:54 PM
  */
-public class SpectrumViewStyle
+public final class SpectrumViewStyle
 {
-    private final Map<FragmentIonType, Color> ionTypeColorMap;
+    private final Map<Ion, Color> ionTypeColorMap;
+
     private double peakWidth = 1;
     private double annotatedPeakWidth = 2;
     private Font peakLabelFont = Font.font("Sans-Serif", FontWeight.NORMAL, 14);
@@ -54,21 +55,24 @@ public class SpectrumViewStyle
     {
         this.ionTypeColorMap = new HashMap<>();
 
-        this.ionTypeColorMap.put(FragmentIonType.a, Color.rgb(0, 28, 127));
+        this.ionTypeColorMap.put(Ion.a, Color.rgb(0, 28, 127));
 //        this.ionTypeColorMap.put(FragmentIonType.B_ION, Color.rgb(0, 10, 255));
-        this.ionTypeColorMap.put(FragmentIonType.b, Color.rgb(0, 99, 115));
-        this.ionTypeColorMap.put(FragmentIonType.c, Color.rgb(1, 117, 23));
-
-        this.ionTypeColorMap.put(FragmentIonType.x, Color.rgb(228, 114, 114));
+        this.ionTypeColorMap.put(Ion.b, Color.rgb(0, 99, 115));
+        this.ionTypeColorMap.put(Ion.c, Color.rgb(1, 117, 23));
+        this.ionTypeColorMap.put(Ion.b_HexNAc, Color.rgb(0, 165, 191));
+        this.ionTypeColorMap.put(Ion.x, Color.rgb(228, 114, 114));
 //        this.ionTypeColorMap.put(FragmentIonType.Y_ION, Color.rgb(196, 20, 36));
-        this.ionTypeColorMap.put(FragmentIonType.y, Color.rgb(190, 9, 0));
-        this.ionTypeColorMap.put(FragmentIonType.z, Color.rgb(244, 121, 32));
+        this.ionTypeColorMap.put(Ion.y, Color.rgb(190, 9, 0));
+        this.ionTypeColorMap.put(Ion.y_HexNAc, Color.rgb(35, 149, 31));
+        this.ionTypeColorMap.put(Ion.z, Color.rgb(244, 121, 32));
 
-        this.ionTypeColorMap.put(FragmentIonType.im, Color.rgb(160, 160, 160));
-        this.ionTypeColorMap.put(FragmentIonType.B_G, SNFGShape.ORANGE);
+        this.ionTypeColorMap.put(Ion.im, Color.rgb(160, 160, 160));
+        this.ionTypeColorMap.put(Ion.B, SNFGShape.ORANGE);
 
-        this.ionTypeColorMap.put(FragmentIonType.p, Color.rgb(118, 0, 161));
-        this.ionTypeColorMap.put(FragmentIonType.Y_G, Color.rgb(118, 0, 161));
+        this.ionTypeColorMap.put(Ion.p, Color.rgb(118, 0, 161));
+        this.ionTypeColorMap.put(Ion.p_H2O, Color.rgb(118, 0, 161));
+        this.ionTypeColorMap.put(Ion.p_NH3, Color.rgb(118, 0, 161));
+        this.ionTypeColorMap.put(Ion.Y, Color.rgb(118, 0, 161));
     }
 
     /**
@@ -363,20 +367,26 @@ public class SpectrumViewStyle
         this.peakLabelFont = peakLabelFont;
     }
 
-    public void setColor(FragmentIonType ionType, Color color)
+    /**
+     * Set the color for given {@link Ion}
+     *
+     * @param ionType {@link Ion}
+     * @param color   {@link Color}
+     */
+    public void setColor(Ion ionType, Color color)
     {
         ionTypeColorMap.put(ionType, color);
     }
 
     /**
-     * Return the display {@link Color} of the given {@link FragmentIonType}.
+     * Return the display {@link Color} of the given {@link Ion}.
      * <p>
      * Supported type: a, b, c, x, y, z, immonium, precursor.
      *
-     * @param ionType {@link FragmentIonType}.
-     * @return {@link Color} of the {@link FragmentIonType}, null for absent.
+     * @param ionType {@link Ion}.
+     * @return {@link Color} of the {@link Ion}, null for absent.
      */
-    public Color getColor(FragmentIonType ionType)
+    public Color getColor(Ion ionType)
     {
         return ionTypeColorMap.get(ionType);
     }

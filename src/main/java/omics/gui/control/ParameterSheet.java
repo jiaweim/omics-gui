@@ -31,7 +31,9 @@ public class ParameterSheet extends PropertySheet
         super((ObservableList) FXCollections.observableList(parameters));
 
         this.parameters = parameters;
-
+        setSearchBoxVisible(false);
+        setModeSwitcherVisible(false);
+        setMode(Mode.NAME);
 
         // Set editor factory to keep track of which editing component belongs
         // to which parameter

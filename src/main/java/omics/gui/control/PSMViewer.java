@@ -2,23 +2,18 @@ package omics.gui.control;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import javafx.beans.property.*;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.concurrent.Task;
-import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
 import omics.gui.TaskType;
 import omics.gui.psm.PeptideSpectrumChart;
-import omics.gui.psm.SpectrumChart;
 import omics.gui.psm.SpectrumViewStyle;
 import omics.gui.psm.util.NodeUtils;
+import omics.gui.util.DoubleStringConverter2;
 import omics.gui.util.ExceptionAlert;
 import omics.gui.util.IntegerStringConverterV2;
 import omics.msdk.io.MsDataAccessor;
@@ -43,13 +38,13 @@ import omics.util.MetaKey;
 import omics.util.ms.MsnSpectrum;
 import omics.util.ms.peaklist.PeakList;
 import omics.util.ms.peaklist.Tolerance;
+import omics.util.ms.peaklist.filter.NPeaksPerBinFilter;
 import omics.util.protein.Peptide;
-import omics.util.protein.ms.FragmentIonType;
+import omics.util.protein.ms.Ion;
 import omics.util.protein.ms.PeptideFragmentAnnotator;
 import omics.util.protein.ms.PeptideFragmenter;
 import omics.util.protein.ms.PeptideIon;
 import omics.util.utils.NumberFormatFactory;
-import omics.util.utils.Pair;
 import omics.util.utils.StringUtils;
 import org.controlsfx.control.TaskProgressView;
 
@@ -58,7 +53,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Pane for PSM.
@@ -67,30 +65,157 @@ import java.util.*;
  * @version 1.0.0
  * @since 16 Dec 2019, 12:29 PM
  */
-public class PSMViewer extends VBox
+public class PSMViewer extends TabPane
 {
-    private static final NumberFormat DELTA_FORMAT_DA = NumberFormatFactory.valueOf(4);
-    private static final NumberFormat DELTA_FORMAT_PPM = NumberFormatFactory.valueOf(2);
-
+    private static final NumberFormat DELTA_FORMAT_DA = NumberFormatFactory.MASS_PRECISION;
+    private static final NumberFormat DELTA_FORMAT_PPM = NumberFormatFactory.DIGIT2;
     private static final NumberFormat MASS_FORMAT = NumberFormatFactory.MASS_PRECISION;
     private static final DecimalFormat INTENSITY_FORMAT = NumberFormatFactory.valueOf("0.####E0");
 
     @FXML
-    private BorderPane psmViewPane;
-    @FXML
     private TableView<PeptideSpectrumMatch> psmTableView;
-    @FXML
-    private Label statusLabel;
     @FXML
     private Button openPSMButton;
     @FXML
     private Button openMSButton;
     @FXML
+    private CheckBox showButton;
+    @FXML
+    private Button updateSettingButton;
+    @FXML
     private SplitPane splitPane;
     @FXML
-    private TabPane psmViewTab;
+    private Tab viewTab;
     @FXML
-    private StackPane upperPane;
+    private Tab settingTab;
+
+    //<editor-fold desc="parameters">
+    @FXML
+    private ComboBox<Double> leftTol;
+    @FXML
+    private ComboBox<Double> rightTol;
+    @FXML
+    private ChoiceBox<String> tolUnit;
+    @FXML
+    private CheckBox filterPeak;
+    @FXML
+    private ComboBox<Integer> peakCount;
+    @FXML
+    private ComboBox<Double> binWidth;
+    @FXML
+    private CheckBox a;
+    @FXML
+    private CheckBox b;
+    @FXML
+    private CheckBox c;
+    @FXML
+    private CheckBox x;
+    @FXML
+    private CheckBox y;
+    @FXML
+    private CheckBox z;
+    @FXML
+    private CheckBox p;
+    @FXML
+    private CheckBox ph2o;
+    @FXML
+    private CheckBox pnh3;
+    @FXML
+    private CheckBox im;
+    @FXML
+    private CheckBox bg;
+    @FXML
+    private CheckBox yg;
+    @FXML
+    private CheckBox bn;
+    @FXML
+    private CheckBox yn;
+    @FXML
+    private ComboBox<Integer> a_minz;
+    @FXML
+    private ComboBox<Integer> b_minz;
+    @FXML
+    private ComboBox<Integer> c_minz;
+    @FXML
+    private ComboBox<Integer> x_minz;
+    @FXML
+    private ComboBox<Integer> y_minz;
+    @FXML
+    private ComboBox<Integer> z_minz;
+    @FXML
+    private ComboBox<Integer> p_minz;
+    @FXML
+    private ComboBox<Integer> ph2o_minz;
+    @FXML
+    private ComboBox<Integer> pnh3_minz;
+    @FXML
+    private ComboBox<Integer> im_minz;
+    @FXML
+    private ComboBox<Integer> bg_minz;
+    @FXML
+    private ComboBox<Integer> yg_minz;
+    @FXML
+    private ComboBox<Integer> bn_minz;
+    @FXML
+    private ComboBox<Integer> yn_minz;
+    @FXML
+    private ComboBox<Integer> a_maxz;
+    @FXML
+    private ComboBox<Integer> b_maxz;
+    @FXML
+    private ComboBox<Integer> c_maxz;
+    @FXML
+    private ComboBox<Integer> x_maxz;
+    @FXML
+    private ComboBox<Integer> y_maxz;
+    @FXML
+    private ComboBox<Integer> z_maxz;
+    @FXML
+    private ComboBox<Integer> p_maxz;
+    @FXML
+    private ComboBox<Integer> ph2o_maxz;
+    @FXML
+    private ComboBox<Integer> pnh3_maxz;
+    @FXML
+    private ComboBox<Integer> im_maxz;
+    @FXML
+    private ComboBox<Integer> bg_maxz;
+    @FXML
+    private ComboBox<Integer> yg_maxz;
+    @FXML
+    private ComboBox<Integer> bn_maxz;
+    @FXML
+    private ComboBox<Integer> yn_maxz;
+
+    @FXML
+    private ColorPicker a_color;
+    @FXML
+    private ColorPicker b_color;
+    @FXML
+    private ColorPicker c_color;
+    @FXML
+    private ColorPicker x_color;
+    @FXML
+    private ColorPicker y_color;
+    @FXML
+    private ColorPicker z_color;
+    @FXML
+    private ColorPicker p_color;
+    @FXML
+    private ColorPicker ph2o_color;
+    @FXML
+    private ColorPicker pnh3_color;
+    @FXML
+    private ColorPicker im_color;
+    @FXML
+    private ColorPicker bg_color;
+    @FXML
+    private ColorPicker yg_color;
+    @FXML
+    private ColorPicker bn_color;
+    @FXML
+    private ColorPicker yn_color;
+    //</editor-fold>
 
     private TaskProgressView<Task<?>> progressView = null;
 
@@ -100,10 +225,6 @@ public class PSMViewer extends VBox
             Tolerance.abs(0.05));
 
     private final OxoniumDB oxoniumDB = OxoniumDB.getInstance();
-    /**
-     * {@link Tolerance} used to match fragment peaks.
-     */
-    private final ObjectProperty<Tolerance> fragmentTolerance = new SimpleObjectProperty<>(Tolerance.abs(0.05));
 
     private IdentResult identResult;
     private MsDataFile msDataFile;
@@ -122,287 +243,173 @@ public class PSMViewer extends VBox
         } catch (IOException e) {
             e.printStackTrace();
         }
-        getStylesheets().add("css/psm_viewer_pane.css");
     }
 
     @FXML
     private void initialize()
     {
-        openPSMButton.setGraphic(TaskType.READ_PSM.getIcon());
+        viewTab.setGraphic(TaskType.VIEW.getIcon());
+        settingTab.setGraphic(TaskType.SETTING.getIcon());
+
+        double size = 20;
+        openPSMButton.setGraphic(TaskType.READ_PSM.getIcon(size, Color.GREEN));
         openPSMButton.setTooltip(new Tooltip("Open PSM file"));
+        openPSMButton.setOnAction(event -> selectPSMFile());
 
-        openMSButton.setGraphic(TaskType.READ_MS.getIcon());
+        openMSButton.setGraphic(TaskType.READ_MS.getIcon(size, Color.DARKRED));
         openMSButton.setTooltip(new Tooltip("Open MS file"));
+        openMSButton.setOnAction(event -> selectMSFile());
 
-        initChart();
+        updateSettingButton.setGraphic(TaskType.REFRESH.getIcon(Color.GREEN));
+        updateSettingButton.setOnAction(event -> updateSettings());
 
-        fragmentTolerance.addListener((observable, oldValue, newValue) -> {
-            annotator.setTolerance(newValue);
-            PeptideSpectrumMatch psm = psmTableView.getSelectionModel().getSelectedItem();
-            if (psm != null) {
-                repaintSpectrum(psm);
-            }
-        });
+        initViewer();
+        initSettings();
 
         psmTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            repaintSpectrum(newValue);
-        });
-
-        initPane();
-        initIonTypes();
-    }
-
-    private final BooleanProperty isShowing = new SimpleBooleanProperty(false);
-    private final DoubleProperty previousPosition = new SimpleDoubleProperty(0.6);
-
-    private void initPane()
-    {
-        // keep the bottom pane fixed.
-        SplitPane.setResizableWithParent(psmViewTab, false);
-        psmViewTab.getTabs().get(0).setGraphic(TaskType.MS_VIEW.getIcon(18));
-        psmViewTab.getTabs().get(1).setGraphic(TaskType.SETTING.getIcon(18));
-
-        psmViewTab.setOnMouseClicked(event -> {
-            EventTarget target = event.getTarget();
-            if (target.getClass() == StackPane.class) {
-                isShowing.set(!isShowing.get());
+            if (showButton.isSelected() && newValue != null) {
+                repaintSpectrum(newValue);
             }
         });
-
-        isShowing.addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                splitPane.setDividerPosition(0, previousPosition.get());
-            } else
-                splitPane.setDividerPosition(0, 1 - (psmViewTab.getTabMinHeight()) / splitPane.getHeight());
-        });
-
-        splitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
-            if (isShowing.get())
-                previousPosition.set(newValue.doubleValue());
-        });
-
-        upperPane.maxHeightProperty().bind(splitPane.heightProperty().subtract(33));
-        isShowing.set(false);
     }
 
-    @FXML
-    private CheckBox aCheck;
-    @FXML
-    private CheckBox bCheck;
-    @FXML
-    private CheckBox cCheck;
-    @FXML
-    private CheckBox xCheck;
-    @FXML
-    private CheckBox yCheck;
-    @FXML
-    private CheckBox zCheck;
-    @FXML
-    private CheckBox pCheck;
-    @FXML
-    private CheckBox pH2OCheck;
-    @FXML
-    private CheckBox pNH3Check;
-    @FXML
-    private CheckBox imCheck;
-    @FXML
-    private CheckBox gbCheck;
-    @FXML
-    private CheckBox gyCheck;
-
-    @FXML
-    private ChoiceBox<Integer> aMinCharge;
-    @FXML
-    private ChoiceBox<Integer> bMinCharge;
-    @FXML
-    private ChoiceBox<Integer> cMinCharge;
-    @FXML
-    private ChoiceBox<Integer> xMinCharge;
-    @FXML
-    private ChoiceBox<Integer> yMinCharge;
-    @FXML
-    private ChoiceBox<Integer> zMinCharge;
-    @FXML
-    private ChoiceBox<Integer> pMinCharge;
-    @FXML
-    private ChoiceBox<Integer> pNH3MinCharge;
-    @FXML
-    private ChoiceBox<Integer> pH2OMinCharge;
-    @FXML
-    private ChoiceBox<Integer> imMinCharge;
-    @FXML
-    private ChoiceBox<Integer> gbMinCharge;
-    @FXML
-    private ChoiceBox<Integer> gyMinCharge;
-
-    @FXML
-    private ChoiceBox<Integer> aMaxCharge;
-    @FXML
-    private ChoiceBox<Integer> bMaxCharge;
-    @FXML
-    private ChoiceBox<Integer> cMaxCharge;
-    @FXML
-    private ChoiceBox<Integer> xMaxCharge;
-    @FXML
-    private ChoiceBox<Integer> yMaxCharge;
-    @FXML
-    private ChoiceBox<Integer> zMaxCharge;
-    @FXML
-    private ChoiceBox<Integer> pMaxCharge;
-    @FXML
-    private ChoiceBox<Integer> pH2OMaxCharge;
-    @FXML
-    private ChoiceBox<Integer> pNH3MaxCharge;
-    @FXML
-    private ChoiceBox<Integer> imMaxCharge;
-    @FXML
-    private ChoiceBox<Integer> gbMaxCharge;
-    @FXML
-    private ChoiceBox<Integer> gyMaxCharge;
-    @FXML
-    private ColorPicker aColor;
-    @FXML
-    private ColorPicker bColor;
-    @FXML
-    private ColorPicker cColor;
-    @FXML
-    private ColorPicker xColor;
-    @FXML
-    private ColorPicker yColor;
-    @FXML
-    private ColorPicker zColor;
-    @FXML
-    private ColorPicker pColor;
-    @FXML
-    private ColorPicker imColor;
-    @FXML
-    private ColorPicker gbColor;
-    @FXML
-    private ColorPicker gyColor;
-
     private final SpectrumViewStyle viewStyle = new SpectrumViewStyle();
-    static final int AUTO = Integer.MAX_VALUE;
 
-    private void initIonTypes()
+    private void setTolerance(Tolerance tolerance)
     {
-        aColor.setValue(viewStyle.getColor(FragmentIonType.a));
-        bColor.setValue(viewStyle.getColor(FragmentIonType.b));
-        cColor.setValue(viewStyle.getColor(FragmentIonType.c));
-        xColor.setValue(viewStyle.getColor(FragmentIonType.x));
-        yColor.setValue(viewStyle.getColor(FragmentIonType.y));
-        zColor.setValue(viewStyle.getColor(FragmentIonType.z));
-        pColor.setValue(viewStyle.getColor(FragmentIonType.p));
-        imColor.setValue(viewStyle.getColor(FragmentIonType.im));
-        gbColor.setValue(viewStyle.getColor(FragmentIonType.B_G));
-        gyColor.setValue(viewStyle.getColor(FragmentIonType.Y_G));
+        leftTol.setValue(tolerance.getMinusError());
+        rightTol.setValue(tolerance.getPlusError());
+        if (tolerance.isAbsolute()) {
+            tolUnit.getSelectionModel().select(1);
+        } else {
+            tolUnit.getSelectionModel().select(0);
+        }
+    }
 
-        bCheck.setSelected(true);
-        yCheck.setSelected(true);
-        pCheck.setSelected(true);
+    private Tolerance getTolerance()
+    {
+        Double left = this.leftTol.getValue();
+        Double right = rightTol.getValue();
+        String unitValue = tolUnit.getValue();
+        if (left == null || right == null)
+            return null;
+        if (unitValue.equals("ppm"))
+            return Tolerance.ppm(left, right);
+        else
+            return Tolerance.abs(left, right);
+    }
+
+    private void setValues(Ion ion, ColorPicker colorPicker, ComboBox<Integer> minZ, ComboBox<Integer> maxZ,
+            List<Integer> values)
+    {
+        colorPicker.setValue(viewStyle.getColor(ion));
+        minZ.getItems().addAll(values);
+        minZ.setValue(1);
+        maxZ.getItems().addAll(values);
+        maxZ.setValue(2);
+    }
+
+    private void initSettings()
+    {
+        DoubleStringConverter2 converter2 = new DoubleStringConverter2();
+        leftTol.setConverter(converter2);
+        rightTol.setConverter(converter2);
+        tolUnit.getItems().addAll("ppm", "Da");
+        setTolerance(Tolerance.abs(0.05));
+        filterPeak.setSelected(false);
+        peakCount.getItems().addAll(1, 5, 10, 15, 20);
+        peakCount.setValue(10);
+        peakCount.setConverter(new IntegerStringConverterV2());
+        binWidth.getItems().addAll(50., 100., 150., 200.);
+        binWidth.setValue(100.);
+        binWidth.setConverter(new DoubleStringConverter2());
+
+        a.setSelected(false);
+        b.setSelected(true);
+        c.setSelected(false);
+        x.setSelected(false);
+        y.setSelected(true);
+        z.setSelected(false);
+        p.setSelected(true);
+        ph2o.setSelected(true);
+        pnh3.setSelected(true);
+        im.setSelected(false);
+        bg.setSelected(false);
+        yg.setSelected(false);
+        bn.setSelected(false);
+        yn.setSelected(false);
 
         List<Integer> charges = new ArrayList<>();
         charges.add(1);
         charges.add(2);
         charges.add(3);
 
-        aMinCharge.getItems().setAll(charges);
-        aMinCharge.setValue(1);
-        bMinCharge.getItems().setAll(charges);
-        bMinCharge.setValue(1);
-        cMinCharge.getItems().setAll(charges);
-        cMinCharge.setValue(1);
-        xMinCharge.getItems().setAll(charges);
-        xMinCharge.setValue(1);
-        yMinCharge.getItems().setAll(charges);
-        yMinCharge.setValue(1);
-        zMinCharge.getItems().setAll(charges);
-        zMinCharge.setValue(1);
-        pMinCharge.getItems().setAll(charges);
-        pMinCharge.setValue(1);
-        pH2OMinCharge.getItems().setAll(charges);
-        pH2OMinCharge.setValue(1);
-        pNH3MinCharge.getItems().setAll(charges);
-        pNH3MinCharge.setValue(1);
-        imMinCharge.getItems().setAll(charges);
-        imMinCharge.setValue(1);
-        gbMinCharge.getItems().setAll(charges);
-        gbMinCharge.setValue(1);
-        gyMinCharge.getItems().setAll(charges);
-        gyMinCharge.setValue(1);
+        setValues(Ion.a, a_color, a_minz, a_maxz, charges);
+        setValues(Ion.b, b_color, b_minz, b_maxz, charges);
+        setValues(Ion.c, c_color, c_minz, c_maxz, charges);
+        setValues(Ion.x, x_color, x_minz, x_maxz, charges);
+        setValues(Ion.y, y_color, y_minz, y_maxz, charges);
+        setValues(Ion.z, z_color, z_minz, z_maxz, charges);
+        setValues(Ion.p, p_color, p_minz, p_maxz, charges);
+        setValues(Ion.p_H2O, ph2o_color, ph2o_minz, ph2o_maxz, charges);
+        setValues(Ion.p_NH3, pnh3_color, pnh3_minz, pnh3_maxz, charges);
+        setValues(Ion.im, im_color, im_minz, im_maxz, charges);
+        setValues(Ion.B, bg_color, bg_minz, bg_maxz, charges);
+        setValues(Ion.Y, yg_color, yg_minz, yg_maxz, charges);
+        setValues(Ion.b_HexNAc, bn_color, bn_minz, bn_maxz, charges);
+        setValues(Ion.y_HexNAc, yn_color, yn_minz, yn_maxz, charges);
 
-        aMaxCharge.getItems().setAll(charges);
-        aMaxCharge.setValue(2);
-        bMaxCharge.getItems().setAll(charges);
-        bMaxCharge.setValue(2);
-        cMaxCharge.getItems().setAll(charges);
-        cMaxCharge.setValue(2);
-        xMaxCharge.getItems().setAll(charges);
-        xMaxCharge.setValue(2);
-        yMaxCharge.getItems().setAll(charges);
-        yMaxCharge.setValue(2);
-        zMaxCharge.getItems().setAll(charges);
-        zMaxCharge.setValue(2);
+        im_maxz.setValue(1);
+        bg_maxz.setValue(1);
 
-        imMaxCharge.getItems().setAll(charges);
-        imMaxCharge.setValue(1);
-        gbMaxCharge.getItems().setAll(charges);
-        gbMaxCharge.setValue(1);
+        charges.add(Integer.MAX_VALUE);
+        IntegerStringConverterV2 intConv = new IntegerStringConverterV2("Auto", Integer.MAX_VALUE);
+        p_maxz.setConverter(intConv);
+        p_maxz.setValue(Integer.MAX_VALUE);
+        ph2o_maxz.setConverter(intConv);
+        ph2o_maxz.setValue(Integer.MAX_VALUE);
+        pnh3_maxz.setConverter(intConv);
+        pnh3_maxz.setValue(Integer.MAX_VALUE);
+        yg_maxz.setConverter(intConv);
+        yg_maxz.setValue(Integer.MAX_VALUE);
 
-        charges.add(AUTO);
-        IntegerStringConverterV2 converter = new IntegerStringConverterV2(Collections.singletonList(Pair.create("auto", Integer.MAX_VALUE)));
-        pMaxCharge.setConverter(converter);
-        pMaxCharge.getItems().setAll(charges);
-        pMaxCharge.setValue(AUTO);
-
-        pNH3MaxCharge.setConverter(converter);
-        pNH3MaxCharge.getItems().setAll(charges);
-        pNH3MaxCharge.setValue(AUTO);
-
-        pH2OMaxCharge.setConverter(converter);
-        pH2OMaxCharge.getItems().setAll(charges);
-        pH2OMaxCharge.setValue(AUTO);
-
-        gyMaxCharge.setConverter(converter);
-        gyMaxCharge.getItems().setAll(charges);
-        gyMaxCharge.setValue(AUTO);
-
-        addIon(FragmentIonType.b, bMinCharge, bMaxCharge);
-        addIon(FragmentIonType.y, yMinCharge, yMaxCharge);
-        annotator.setPeptideIonList(peptideIons);
+        updateSettings();
     }
 
-    private final Table<FragmentIonType, Integer, PeptideIon> peptideIonTable = HashBasedTable.create();
     private final List<PeptideIon> peptideIons = new ArrayList<>();
+    private NPeaksPerBinFilter filter = null;
 
-    @FXML
-    private void updateIonTypes()
+    private void updateSettings()
     {
         peptideIons.clear();
-        if (aCheck.isSelected())
-            addIon(FragmentIonType.a, aMinCharge, aMaxCharge);
-        if (bCheck.isSelected())
-            addIon(FragmentIonType.b, bMinCharge, bMaxCharge);
-        if (cCheck.isSelected())
-            addIon(FragmentIonType.c, cMinCharge, cMaxCharge);
-        if (xCheck.isSelected())
-            addIon(FragmentIonType.x, xMinCharge, xMaxCharge);
-        if (yCheck.isSelected())
-            addIon(FragmentIonType.y, yMinCharge, yMaxCharge);
-        if (zCheck.isSelected())
-            addIon(FragmentIonType.z, zMinCharge, zMaxCharge);
-        if (imCheck.isSelected())
-            addIon(FragmentIonType.im, imMinCharge, imMaxCharge);
+        // update ion types
+        updateIon(a, Ion.a, a_minz, a_maxz, a_color);
+        updateIon(b, Ion.b, b_minz, b_maxz, b_color);
+        updateIon(c, Ion.c, c_minz, c_maxz, c_color);
+        updateIon(x, Ion.x, x_minz, x_maxz, x_color);
+        updateIon(y, Ion.y, y_minz, y_maxz, y_color);
+        updateIon(z, Ion.z, z_minz, z_maxz, z_color);
+        updateIon(im, Ion.im, im_minz, im_maxz, im_color);
+        updateIon(bn, Ion.b_HexNAc, bn_minz, bn_maxz, bn_color);
+        updateIon(yn, Ion.y_HexNAc, yn_minz, yn_maxz, yn_color);
+
         annotator.setPeptideIonList(peptideIons);
-        viewStyle.setColor(FragmentIonType.a, aColor.getValue());
-        viewStyle.setColor(FragmentIonType.b, bColor.getValue());
-        viewStyle.setColor(FragmentIonType.c, cColor.getValue());
-        viewStyle.setColor(FragmentIonType.x, xColor.getValue());
-        viewStyle.setColor(FragmentIonType.y, yColor.getValue());
-        viewStyle.setColor(FragmentIonType.z, zColor.getValue());
-        viewStyle.setColor(FragmentIonType.p, pColor.getValue());
-        viewStyle.setColor(FragmentIonType.im, imColor.getValue());
-        viewStyle.setColor(FragmentIonType.B_G, gbColor.getValue());
-        viewStyle.setColor(FragmentIonType.Y_G, gyColor.getValue());
+        Tolerance tol = getTolerance();
+        if (tol != null)
+            annotator.setTolerance(tol);
+        if (filterPeak.isSelected()) {
+            filter = new NPeaksPerBinFilter(peakCount.getValue(), binWidth.getValue());
+        } else {
+            filter = null;
+        }
+
+        // update colors
+        viewStyle.setColor(Ion.p, p_color.getValue());
+        viewStyle.setColor(Ion.p_H2O, ph2o_color.getValue());
+        viewStyle.setColor(Ion.p_NH3, pnh3_color.getValue());
+        viewStyle.setColor(Ion.B, bg_color.getValue());
+        viewStyle.setColor(Ion.Y, yg_color.getValue());
+
         chart.setStyle(viewStyle);
 
         // update currently selected PSM
@@ -412,97 +419,97 @@ public class PSMViewer extends VBox
         }
     }
 
-    private void addIon(FragmentIonType fragmentIonType, ChoiceBox<Integer> minChoice, ChoiceBox<Integer> maxChoice)
+    private final Table<Ion, Integer, PeptideIon> peptideIonTable = HashBasedTable.create();
+
+    private void updateIon(CheckBox checkBox, Ion ionType, ComboBox<Integer> minCharge,
+            ComboBox<Integer> maxCharge, ColorPicker colorPicker)
     {
-        Integer minCharge = minChoice.getValue();
-        Integer maxCharge = maxChoice.getValue();
-        if (minCharge > maxCharge) {
-            maxCharge = minCharge;
-            minCharge = maxChoice.getValue();
+        if (!checkBox.isSelected()) {
+            return;
+        }
+        Integer minZ = minCharge.getValue();
+        Integer maxZ = maxCharge.getValue();
+        if (minZ > maxZ) {
+            maxZ = minZ;
+            minZ = maxCharge.getValue();
         }
 
-        for (int i = minCharge; i <= maxCharge; i++) {
-            PeptideIon peptideIon = peptideIonTable.get(fragmentIonType, i);
+        for (int i = minZ; i <= maxZ; i++) {
+            PeptideIon peptideIon = peptideIonTable.get(ionType, i);
             if (peptideIon == null) {
-                peptideIon = new PeptideIon(fragmentIonType, i);
-                peptideIonTable.put(fragmentIonType, i, peptideIon);
+                peptideIon = new PeptideIon(ionType, i);
+                peptideIonTable.put(ionType, i, peptideIon);
             }
             this.peptideIons.add(peptideIon);
         }
+        viewStyle.setColor(ionType, colorPicker.getValue());
     }
 
-    private void initChart()
+    private void initViewer()
     {
         this.chart = new PeptideSpectrumChart();
-        psmViewPane.setCenter(chart);
-        SpectrumChart spectrumChart = chart.getSpectrumChart();
-        spectrumChart.mzProperty().addListener((observable, oldValue, newValue) ->
-                statusLabel.setText(String.format("Mass: %.4f, Intensity: %.4e", newValue.doubleValue(), spectrumChart.intensityProperty().doubleValue())));
-        spectrumChart.intensityProperty().addListener((observable, oldValue, newValue) ->
-                statusLabel.setText(String.format("Mass: %.4f, Intensity: %.4e", spectrumChart.mzProperty().doubleValue(), newValue.doubleValue())));
+        showButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                splitPane.getItems().add(chart);
+                splitPane.setDividerPositions(0.5);
 
-        ContextMenu menu = new ContextMenu();
-        MenuItem item = new Menu("Save to PNG");
-        item.setOnAction(event1 -> {
-            FileChooser chooser = new FileChooser();
-            chooser.setInitialFileName("spectrum.png");
-            File file = chooser.showSaveDialog(getScene().getWindow());
-            if (file != null) {
-                NodeUtils.saveNodeAsPng(chart, 2, file.getAbsolutePath());
+                PeptideSpectrumMatch selectedItem = psmTableView.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    repaintSpectrum(selectedItem);
+                }
+            } else {
+                splitPane.getItems().remove(chart);
             }
         });
-        menu.getItems().add(item);
-        menu.setAutoHide(true);
-
-        chart.setOnContextMenuRequested(event -> menu.show(chart.getScene().getWindow(), event.getScreenX(), event.getScreenY()));
     }
 
     private void repaintSpectrum(PeptideSpectrumMatch psm)
     {
         String key = PSMKeyFunc.FILE_SCAN.getKey(psm);
         Peptide peptide = psm.getPeptide();
-        if (spectrumMap.containsKey(key)) {
-            MsnSpectrum spectrum = spectrumMap.get(key);
-            spectrum.clearAnnotations();
-            annotator.annotate((PeakList) spectrum, peptide);
-
-            Tolerance tolerance = fragmentTolerance.get();
-            if (gbCheck.isSelected()) {
-                IonAnnotator.annotateOxonium(spectrum, tolerance, oxoniumDB.getMarkers(),
-                        gbMinCharge.getValue(), gbMaxCharge.getValue());
-            }
-
-            if (gyCheck.isSelected()) {
-                String composition = psm.getMetaString(Delta.NAME);
-                if (StringUtils.isNotEmpty(composition)) {
-                    GlycanComposition glycanComposition = GlycanComposition.parseComposition(composition);
-                    IonAnnotator.annotateGlycanY(spectrum, tolerance, peptide.getMolecularMass(),
-                            gyMinCharge.getValue(), gyMaxCharge.getValue(), glycanComposition);
-                }
-//                IonAnnotator.annotateOGlycanY(spectrum, tolerance,
-//                        gyMinCharge.getValue(), gyMaxCharge.getValue());
-            }
-
-            if (pCheck.isSelected()) {
-                IonAnnotator.annotatePrecursor(spectrum, tolerance,
-                        pMinCharge.getValue(), pMaxCharge.getValue());
-            }
-
-            if (pNH3Check.isSelected()) {
-                IonAnnotator.annotatePrecursorNH3(spectrum, tolerance,
-                        pNH3MinCharge.getValue(), pNH3MaxCharge.getValue());
-            }
-
-            if (pH2OCheck.isSelected()) {
-                IonAnnotator.annotatePrecursorH2O(spectrum, fragmentTolerance.get(),
-                        pH2OMinCharge.getValue(), pH2OMaxCharge.getValue());
-            }
-
-            chart.setPeptideSpectrum(peptide, spectrum);
-        } else {
+        if (!spectrumMap.containsKey(key)) {
             chart.clearSpectrum();
             chart.setPeptide(peptide);
+            return;
         }
+        MsnSpectrum spectrum = spectrumMap.get(key);
+        spectrum.clearAnnotations();
+        if (filter != null) {
+            spectrum = spectrum.copy(filter);
+        }
+        annotator.annotate((PeakList) spectrum, peptide);
+
+        Tolerance tolerance = getTolerance();
+        if (bg.isSelected()) {
+            IonAnnotator.annotateOxonium(spectrum, tolerance, oxoniumDB.getMarkers(),
+                    bg_minz.getValue(), bg_maxz.getValue());
+        }
+
+        if (yg.isSelected()) {
+            String composition = psm.getMetaString(Delta.NAME);
+            if (StringUtils.isNotEmpty(composition)) {
+                GlycanComposition glycanComposition = GlycanComposition.parseComposition(composition);
+                IonAnnotator.annotateGlycanY(spectrum, tolerance, peptide.getMolecularMass(),
+                        yg_minz.getValue(), yg_maxz.getValue(), glycanComposition);
+            }
+        }
+
+        if (p.isSelected()) {
+            IonAnnotator.annotatePrecursor(spectrum, tolerance,
+                    p_minz.getValue(), p_maxz.getValue());
+        }
+
+        if (pnh3.isSelected()) {
+            IonAnnotator.annotatePrecursorNH3(spectrum, tolerance,
+                    pnh3_minz.getValue(), pnh3_maxz.getValue());
+        }
+
+        if (ph2o.isSelected()) {
+            IonAnnotator.annotatePrecursorH2O(spectrum, tolerance,
+                    ph2o_minz.getValue(), ph2o_maxz.getValue());
+        }
+
+        chart.setPeptideSpectrum(peptide, spectrum);
     }
 
     /**
@@ -515,8 +522,10 @@ public class PSMViewer extends VBox
         this.progressView = progressView;
     }
 
-    @FXML
-    private void onSelectPSMFile()
+    /**
+     * update {@link IdentResult}, {@link TaskProgressView} and {@link Tolerance}
+     */
+    private void selectPSMFile()
     {
         FileChooser psmFileChooser = new FileChooser();
         psmFileChooser.setTitle("Choose PSM File");
@@ -535,33 +544,30 @@ public class PSMViewer extends VBox
         Task<IdentResult> proTask = NodeUtils.createTask(task);
         if (progressView != null) {
             progressView.getTasks().add(proTask);
-            progressView.setGraphicFactory(new Callback<Task<?>, Node>()
-            {
-                @Override
-                public Node call(Task<?> param)
-                {
-                    return null;
-                }
-            });
         }
         proTask.setOnSucceeded(event -> {
-            identResult = proTask.getValue();
-            fragmentTolerance.set(identResult.getParameters().getFragmentTolerance());
+            this.identResult = proTask.getValue();
+            Tolerance tol = identResult.getParameters().getFragmentTolerance();
+            if (tol != null) {
+                setTolerance(tol);
+                this.annotator.setTolerance(tol);
+            }
             updatePSMTable();
             openPSMButton.getTooltip().setText("Opened PSM file: " + file.getName());
         });
 
         Thread thread = new Thread(proTask);
+        thread.setDaemon(true);
         thread.start();
     }
 
     private void updatePSMTable()
     {
-        // choose a PSM to detect fields
-        // it is better to be target PSM, as decoy protein may lack some fields.
         if (identResult == null || identResult.isEmpty())
             return;
 
+        // choose a PSM to detect fields
+        // it is better to be target PSM, as decoy protein may lack some fields.
         PeptideSpectrumMatch refPSM = null;
         for (PeptideSpectrumMatch psm : identResult) {
             if (psm.isTarget()) {
@@ -682,8 +688,7 @@ public class PSMViewer extends VBox
         psmTableView.getItems().setAll(identResult.getPSMList());
     }
 
-    @FXML
-    private void onSelectMSFile()
+    private void selectMSFile()
     {
         FileChooser msFileChooser = new FileChooser();
         msFileChooser.getExtensionFilters().addAll(
@@ -713,6 +718,7 @@ public class PSMViewer extends VBox
             openMSButton.getTooltip().setText("Opened MS file: " + file.getName());
         });
         Thread thread = new Thread(task);
+        thread.setDaemon(true);
         thread.start();
     }
 }

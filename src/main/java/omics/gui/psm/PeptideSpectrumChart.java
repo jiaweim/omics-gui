@@ -1,11 +1,22 @@
 package omics.gui.psm;
 
+import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import omics.gui.psm.util.NodeUtils;
 import omics.util.ms.peaklist.PeakAnnotation;
 import omics.util.ms.peaklist.PeakList;
 import omics.util.protein.Peptide;
 import omics.util.protein.ms.PeptideFragAnnotation;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,20 +38,42 @@ public class PeptideSpectrumChart extends BorderPane
         setCenter(spectrumChart);
         setTop(peptideChart);
 
+        Label label = new Label();
+        setBottom(label);
+        BorderPane.setAlignment(label, Pos.CENTER_RIGHT);
+        BorderPane.setMargin(label, new Insets(0, 10, 0, 0));
+
         this.widthProperty().addListener((observable, oldValue, newValue) -> {
             spectrumChart.setPrefWidth(newValue.doubleValue());
             peptideChart.setPrefWidth(newValue.doubleValue());
         });
 
         this.heightProperty().addListener((observable, oldValue, newValue) -> {
-            spectrumChart.setPrefHeight(newValue.doubleValue() * 0.80);
+            spectrumChart.setPrefHeight(newValue.doubleValue() * 0.8);
             peptideChart.setPrefHeight(newValue.doubleValue() * 0.2);
         });
 
-//        spectrumPane.mzProperty().addListener((observable, oldValue, newValue) ->
-//                label.setText(String.format("Mass: %.2f, Intensity: %.2e", newValue.doubleValue(), spectrumPane.intensityProperty().doubleValue())));
-//        spectrumPane.intensityProperty().addListener((observable, oldValue, newValue) ->
-//                label.setText(String.format("Mass: %.2f, Intensity: %.2e", spectrumPane.mzProperty().doubleValue(), newValue.doubleValue())));
+        spectrumChart.mzProperty().addListener((observable, oldValue, newValue) ->
+                label.setText(String.format("Mass: %.4f, Intensity: %.4e", newValue.doubleValue(),
+                        spectrumChart.intensityProperty().doubleValue())));
+        spectrumChart.intensityProperty().addListener((observable, oldValue, newValue) ->
+                label.setText(String.format("Mass: %.4f, Intensity: %.4e",
+                        spectrumChart.mzProperty().doubleValue(), newValue.doubleValue())));
+
+        ContextMenu menu = new ContextMenu();
+        MenuItem item = new Menu("Save to PNG");
+        item.setOnAction(event1 -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setInitialFileName("spectrum.png");
+            File file = chooser.showSaveDialog(getScene().getWindow());
+            if (file != null) {
+                NodeUtils.saveNodeAsPng(this, 2, file.getAbsolutePath());
+            }
+        });
+        menu.getItems().add(item);
+        menu.setAutoHide(true);
+
+        setOnContextMenuRequested(event -> menu.show(getScene().getWindow(), event.getScreenX(), event.getScreenY()));
     }
 
     public void setStyle(SpectrumViewStyle style)
