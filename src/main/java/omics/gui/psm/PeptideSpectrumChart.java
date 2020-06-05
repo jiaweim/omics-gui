@@ -1,6 +1,5 @@
 package omics.gui.psm;
 
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
@@ -8,7 +7,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import omics.gui.psm.util.NodeUtils;
 import omics.util.ms.peaklist.PeakAnnotation;

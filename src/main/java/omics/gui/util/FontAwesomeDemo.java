@@ -28,7 +28,7 @@ public class FontAwesomeDemo extends Application
             Button button = new Button();
             button.setText(glyph.name());
             Glyph icon = fontAwesome.create(glyph);
-            System.out.println(icon.getFontSize());
+            System.out.println(glyph.name() + "\t" + icon.getTextFill());
             button.setGraphic(icon);
 //            button.setPrefHeight(20);
             listView.getItems().add(button);

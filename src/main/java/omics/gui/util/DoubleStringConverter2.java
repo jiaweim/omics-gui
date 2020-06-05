@@ -4,6 +4,7 @@ import omics.util.utils.Pair;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,9 +21,15 @@ public class DoubleStringConverter2 extends AbstractStringConverter<Double>
         this(null);
     }
 
+
     public DoubleStringConverter2(NumberFormat numberFormat)
     {
         this(new ArrayList<>(), numberFormat);
+    }
+
+    public DoubleStringConverter2(String name, double value)
+    {
+        this(Collections.singletonList(Pair.create(name, value)), null);
     }
 
     public DoubleStringConverter2(List<Pair<String, Double>> pairList, NumberFormat numberFormat)

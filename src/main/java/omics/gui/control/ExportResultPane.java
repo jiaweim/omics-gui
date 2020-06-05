@@ -1,23 +1,23 @@
 package omics.gui.control;
 
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import omics.gui.parameter.*;
+import omics.gui.TaskType;
+import omics.gui.task.ExportResultTask;
+import omics.gui.util.DoubleStringConverter2;
+import omics.gui.util.IntegerStringConverterV2;
 import omics.util.protein.database.util.DoShuffleDB;
 import omics.util.utils.StringUtils;
-import org.controlsfx.glyphfont.FontAwesome;
-import org.controlsfx.glyphfont.GlyphFont;
-import org.controlsfx.glyphfont.GlyphFontRegistry;
+import org.controlsfx.control.TaskProgressView;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,6 +44,24 @@ public class ExportResultPane extends SplitPane
     }
 
     @FXML
+    private CheckBox percolatorCheckNode;
+    @FXML
+    private TextField percolatorPathNode;
+    @FXML
+    private Button choosePercolatorNode;
+    @FXML
+    private TextField decoyTagNode;
+    @FXML
+    private ComboBox<Double> fdrNode;
+    @FXML
+    private ComboBox<Integer> topNNode;
+    @FXML
+    private ComboBox<Integer> rankScoreNode;
+    @FXML
+    private ComboBox<Double> evalueNode;
+    @FXML
+    private CheckBox deltaNode;
+    @FXML
     private Button addButton;
     @FXML
     private Button removeButton;
@@ -56,46 +74,106 @@ public class ExportResultPane extends SplitPane
     @FXML
     private Button runButton;
     @FXML
-    private StackPane rightPane;
+    private CheckBox samesetNode;
+    @FXML
+    private TextField fastaNode;
+    @FXML
+    private Button chooseFastaNode;
+
+    private TaskProgressView<Task<?>> taskProgressView;
+
+    public void setTaskProgressView(TaskProgressView<Task<?>> taskProgressView)
+    {
+        this.taskProgressView = taskProgressView;
+    }
 
     @FXML
     private void initialize()
     {
-        GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
-        addButton.setGraphic(fontAwesome.create(FontAwesome.Glyph.FOLDER_OPEN_ALT));
+        addButton.setGraphic(TaskType.OPEN_FOLDER.getIcon());
         addButton.setOnAction(event -> selectFile());
 
-        removeButton.setGraphic(fontAwesome.create(FontAwesome.Glyph.TRASH_ALT));
+        removeButton.setGraphic(TaskType.DELETE.getIcon());
         removeButton.setOnAction(event -> resultFileListNode.getItems().removeAll(resultFileListNode.getSelectionModel().getSelectedItems()));
 
         resultFileListNode.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         resultFileListNode.setEditable(false);
 
-        chooseOutpathButton.setGraphic(fontAwesome.create(FontAwesome.Glyph.FOLDER_OPEN));
+        chooseOutpathButton.setGraphic(TaskType.CHOOSE_FILE.getIcon());
         chooseOutpathButton.setOnAction(event -> selectOutPath());
-        runButton.setGraphic(fontAwesome.create(FontAwesome.Glyph.FORWARD).color(Color.GREEN));
+
+        runButton.setGraphic(TaskType.RUN.getIcon(Color.GREEN));
         runButton.setOnAction(event -> export());
 
-        initSheet();
+        initParameters();
     }
 
-    private final BooleanParameter usePercolatorNode = new BooleanParameter("Use percolator", "Use percolator to calculate FDR", "Percolator", true);
-    private final FileParameter percolatorPathNode = new FileParameter("Percolator", "Runnable percolator path", "Percolator", FileParameter.ChooseType.OPEN);
-
-    private final StringParameter decoyIdentifier = new StringParameter("Decoy Tag", "Decoy protein identifier", "Settings", DoShuffleDB.DECOY_PROTEIN_PREFIX);
-    private final DoubleParameter fdrNode = new DoubleParameter("FDR", "PSM Level FDR threshold", "Score", 0.01);
-    private final IntegerParameter topNNode = new IntegerParameter("TopN", "Maximum number of PSM for each spectrum", "Settings", 1);
-    private final IntegerParameter rawScoreNode = (IntegerParameter) new IntegerParameter("Raw Score", "The minimum raw score", "Score", 0)
-            .candidateValues(Arrays.asList(Integer.MIN_VALUE, 0, 10, 15, 20)).addPair("No Limit", Integer.MIN_VALUE);
-    private final DoubleParameter eValueNode = (DoubleParameter) new DoubleParameter("E-Value", "The maximum e-value for PSM", "Score", 0.01)
-            .candidateValues(Arrays.asList(Double.MIN_VALUE, 0.01, 0.05)).addPair("No Limit", Double.MIN_VALUE);
-    private final BooleanParameter onlyDeltaNode = new BooleanParameter("Only delta", "Keep only PSM with delta", "Settings", false);
-
-    private void initSheet()
+    private void initParameters()
     {
-        ParameterSheet sheet = new ParameterSheet();
-        rightPane.getChildren().add(sheet);
-        sheet.getItems().addAll(usePercolatorNode, percolatorPathNode, decoyIdentifier, fdrNode, topNNode, rawScoreNode, eValueNode, onlyDeltaNode);
+        percolatorCheckNode.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                percolatorPathNode.setEditable(true);
+                percolatorPathNode.setDisable(false);
+                choosePercolatorNode.setDisable(false);
+            } else {
+                percolatorPathNode.setDisable(true);
+                choosePercolatorNode.setDisable(true);
+            }
+        });
+        percolatorCheckNode.setSelected(false);
+        percolatorPathNode.setDisable(true);
+        choosePercolatorNode.setDisable(true);
+
+        choosePercolatorNode.setGraphic(TaskType.CHOOSE_FILE.getIcon());
+        choosePercolatorNode.setOnAction(event -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Runnable Percolator");
+            File file = chooser.showOpenDialog(getScene().getWindow());
+            if (file != null)
+                percolatorPathNode.setText(file.getAbsolutePath());
+        });
+
+        decoyTagNode.setText(DoShuffleDB.DECOY_PROTEIN_PREFIX);
+
+        fdrNode.setConverter(new DoubleStringConverter2());
+        fdrNode.setValue(0.01);
+
+        topNNode.setConverter(new IntegerStringConverterV2());
+        topNNode.setValue(1);
+
+        rankScoreNode.setConverter(new IntegerStringConverterV2("No Limit", Integer.MIN_VALUE));
+        rankScoreNode.getItems().addAll(Integer.MIN_VALUE, 0, 10, 15, 20);
+        rankScoreNode.setValue(20);
+
+        evalueNode.setConverter(new DoubleStringConverter2("No Limit", Double.MIN_VALUE));
+        evalueNode.getItems().addAll(Double.MIN_VALUE, 0.01, 0.05);
+        evalueNode.setValue(0.01);
+        evalueNode.setTooltip(new Tooltip("The maximum e-value for PSM"));
+
+        deltaNode.setTooltip(new Tooltip("Keep only PSM with delta"));
+
+        samesetNode.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                fastaNode.setDisable(false);
+                chooseFastaNode.setDisable(false);
+            } else {
+                fastaNode.setDisable(true);
+                chooseFastaNode.setDisable(true);
+            }
+        });
+        samesetNode.setSelected(false);
+        fastaNode.setDisable(true);
+        chooseFastaNode.setDisable(true);
+
+        chooseFastaNode.setGraphic(TaskType.CHOOSE_FILE.getIcon());
+        chooseFastaNode.setOnAction(event -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Fasta file");
+            File file = chooser.showOpenDialog(getScene().getWindow());
+            if (file != null) {
+                fastaNode.setText(file.getAbsolutePath());
+            }
+        });
     }
 
     private void showAlert(Alert.AlertType type, String msg)
@@ -121,10 +199,11 @@ public class ExportResultPane extends SplitPane
             return;
         }
 
-        Boolean userPercolator = usePercolatorNode.getValue();
-        if (userPercolator) {
-            File percolatorPath = percolatorPathNode.getValue();
-            if (!percolatorPath.exists()) {
+        boolean usePercolator = percolatorCheckNode.isSelected();
+        if (usePercolator) {
+            String path = percolatorPathNode.getText();
+            File perPath = new File(path);
+            if (!perPath.exists()) {
                 showAlert(Alert.AlertType.ERROR, "Please specify the percolator path");
                 return;
             }
@@ -137,40 +216,28 @@ public class ExportResultPane extends SplitPane
         }
 
         Integer topN = topNNode.getValue();
-        Integer rawScore = rawScoreNode.getValue();
-        Double eValue = eValueNode.getValue();
-        if (eValue == null || eValue < 0 || eValue > 1) {
+        Integer rankScore = rankScoreNode.getValue();
+        Double evalue = evalueNode.getValue();
+        if (evalue == null || evalue < 0 || evalue > 1) {
             showAlert(Alert.AlertType.ERROR, "E-Value should in range [0, 1]");
             return;
         }
-        Boolean onlyDelta = onlyDeltaNode.getValue();
-        String decoyTag = decoyIdentifier.getValue();
+        boolean onlyDelta = deltaNode.isSelected();
+        String decoyTag = decoyTagNode.getText();
 
-        if (userPercolator) {
-            File percolatorPath = percolatorPathNode.getValue();
-            if (!percolatorPath.exists()) {
-                showAlert(Alert.AlertType.ERROR, "Please specify the percolator path");
+        if (usePercolator) {
+
+        } else {
+            ExportResultTask task = new ExportResultTask(fdr, evalue, rankScore, topN, onlyDelta, fileList, targetFilePath, decoyTag);
+            if (samesetNode.isSelected()) {
+                task.setRemoveSameset(true);
+                task.setFasta(fastaNode.getText());
             }
+            taskProgressView.getTasks().add(task);
+            Thread thread = new Thread(task);
+            thread.setDaemon(true);
+            thread.start();
         }
-
-
-//
-//        mainPane.getSelectionModel().select(1);
-//
-//        ExportResultTask task = new ExportResultTask(fdrValue, maxEValue, minRaw, topN,
-//                keepNonGlycanNode.isSelected(), fileList, targetFilePath, DoShuffleDB.DECOY_PROTEIN_PREFIX);
-//        Task<Void> runTask = new Task<Void>()
-//        {
-//            @Override
-//            protected Void call() throws Exception
-//            {
-//
-//                return null;
-//            }
-//        };
-//        Thread thread = new Thread(runTask);
-//        thread.setDaemon(true);
-//        thread.start();
     }
 
     private File lastOpenFolder = null;

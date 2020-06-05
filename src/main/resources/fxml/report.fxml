@@ -2,14 +2,20 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.RowConstraints?>
 
-<fx:root dividerPositions="0.6" type="SplitPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root dividerPositions="0.6" prefHeight="481.0" prefWidth="614.0" type="SplitPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <items>
       <BorderPane>
          <top>
@@ -18,9 +24,6 @@
                     <Button fx:id="addButton" mnemonicParsing="false" prefHeight="36.0" prefWidth="36.0" />
                     <Button fx:id="removeButton" mnemonicParsing="false" prefHeight="36.0" prefWidth="36.0" />
                </children>
-               <padding>
-                  <Insets bottom="2.0" />
-               </padding>
             </HBox>
          </top>
          <bottom>
@@ -30,15 +33,82 @@
                     <Button fx:id="chooseOutpathButton" mnemonicParsing="false" />
                     <Button fx:id="runButton" mnemonicParsing="false" />
                </children>
+               <BorderPane.margin>
+                  <Insets bottom="6.0" />
+               </BorderPane.margin>
                <padding>
-                  <Insets top="2.0" />
+                  <Insets right="6.0" />
                </padding>
             </HBox>
          </bottom>
          <center>
-            <ListView fx:id="resultFileListNode" BorderPane.alignment="CENTER" />
+            <ListView fx:id="resultFileListNode" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="6.0" right="6.0" top="6.0" />
+               </BorderPane.margin></ListView>
          </center>
+         <padding>
+            <Insets left="6.0" top="6.0" />
+         </padding>
       </BorderPane>
-      <StackPane fx:id="rightPane" prefHeight="150.0" prefWidth="200.0" />
+      <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="0.0">
+         <content>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="NEVER" minWidth="108.0" prefWidth="108.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="140.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                  <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                  <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                  <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                  <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                  <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                  <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                  <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                  <RowConstraints minHeight="36.0" prefHeight="36.0" vgrow="NEVER" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="User Percolator" GridPane.rowIndex="1" />
+                  <CheckBox fx:id="percolatorCheckNode" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label text="Percolator" GridPane.rowIndex="2" />
+                  <HBox prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <children>
+                        <TextField fx:id="percolatorPathNode" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="choosePercolatorNode" mnemonicParsing="false" />
+                     </children>
+                  </HBox>
+                  <Label text="Decoy Tag" GridPane.rowIndex="3" />
+                  <TextField fx:id="decoyTagNode" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
+                  <Label text="FDR" GridPane.rowIndex="4" />
+                  <Label text="TopN" GridPane.rowIndex="5" />
+                  <Label text="Rank Score" GridPane.rowIndex="6" />
+                  <Label text="E-Value" GridPane.rowIndex="7" />
+                  <Label text="Only Delta" GridPane.rowIndex="8" />
+                  <CheckBox fx:id="deltaNode" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                  <ComboBox fx:id="evalueNode" editable="true" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
+                  <ComboBox fx:id="rankScoreNode" editable="true" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
+                  <ComboBox fx:id="topNNode" editable="true" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
+                  <ComboBox fx:id="fdrNode" editable="true" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" />
+                  <Label text="Remove Same set" GridPane.rowIndex="9" />
+                  <CheckBox fx:id="samesetNode" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                  <Label text="Fasta" GridPane.rowIndex="10" />
+                  <HBox prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
+                     <children>
+                        <TextField fx:id="fastaNode" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="chooseFastaNode" mnemonicParsing="false" />
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="6.0" right="6.0" />
+               </padding>
+            </GridPane>
+         </content>
+      </ScrollPane>
    </items>
 </fx:root>

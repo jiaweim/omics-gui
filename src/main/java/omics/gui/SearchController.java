@@ -1,6 +1,7 @@
 package omics.gui;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,21 +18,17 @@ import javafx.stage.Window;
 import omics.gui.control.ExportResultPane;
 import omics.gui.control.PSMViewer;
 import omics.gui.control.ParameterPane;
-import omics.gui.psm.util.NodeUtils;
-import omics.pdk.ident.MainSearch;
+import omics.pdk.ident.FXSearchTask;
 import omics.pdk.ident.SearchParameters;
 import omics.util.utils.SystemUtils;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
-import org.controlsfx.glyphfont.FontAwesome;
-import org.controlsfx.glyphfont.GlyphFont;
-import org.controlsfx.glyphfont.GlyphFontRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.controlsfx.tools.Borders;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,33 +39,16 @@ import java.util.Optional;
  */
 public class SearchController
 {
-    private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
-
-    /**
-     * select parameter file
-     */
     @FXML
     private TextField parameterFileNode;
     @FXML
     private Button selectParameterFileButton;
-
-    /**
-     * select MS files
-     */
     @FXML
     private Button addMSFileButton;
     @FXML
     private Button removeMSFileButton;
-
-    /**
-     * display MS files
-     */
     @FXML
     private ListView<File> msFileListNode;
-
-    /**
-     * run
-     */
     @FXML
     private Spinner<Integer> threadNode;
     @FXML
@@ -77,18 +57,8 @@ public class SearchController
     private Button startButton;
     @FXML
     private Button cancelButton;
-
-    /**
-     * progress viewer
-     */
     @FXML
     private TaskProgressView<Task<?>> taskProgressNode;
-
-    /**
-     * main pane, used to add other tabs
-     */
-    @FXML
-    private TabPane mainPane;
     @FXML
     private Tab reportTab;
     @FXML
@@ -106,8 +76,6 @@ public class SearchController
         this.mainWindow = mainWindow;
     }
 
-    private final GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
-
     @FXML
     private void initialize()
     {
@@ -119,10 +87,13 @@ public class SearchController
             currentProcessor = 1;
         threadNode.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, processors, currentProcessor));
         threadNode.setTooltip(new Tooltip("0 means automatic mode"));
-        numTaskNode.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0));
+        numTaskNode.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 2000, 0));
         numTaskNode.setTooltip(new Tooltip("0 means automatic mode"));
 
-        reportTab.setContent(new ExportResultPane());
+        ExportResultPane exportResultPane = new ExportResultPane();
+        exportResultPane.setTaskProgressView(taskProgressNode);
+        reportTab.setContent(exportResultPane);
+
         parameterTab.setContent(new ParameterPane());
         initViewer();
 //        URL imgUrl = getClass().getClassLoader().getResource("icon/search.png");
@@ -131,6 +102,7 @@ public class SearchController
 
     private void initSearch()
     {
+        selectParameterFileButton.setGraphic(TaskType.OPEN_FILE.getIcon());
         selectParameterFileButton.setOnAction(event -> {
             FileChooser chooser = new FileChooser();
             chooser.setTitle("Choose parameter file");
@@ -145,7 +117,7 @@ public class SearchController
         });
 
         msFileListNode.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        addMSFileButton.setGraphic(fontAwesome.create(FontAwesome.Glyph.FOLDER_OPEN_ALT));
+        addMSFileButton.setGraphic(TaskType.OPEN_FOLDER.getIcon());
         addMSFileButton.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose MS Files");
@@ -163,13 +135,14 @@ public class SearchController
             }
         });
 
-        removeMSFileButton.setGraphic(fontAwesome.create(FontAwesome.Glyph.TRASH_ALT));
+        removeMSFileButton.setGraphic(TaskType.DELETE.getIcon());
         removeMSFileButton.setOnAction(event -> msFileListNode.getItems().removeAll(msFileListNode.getSelectionModel().getSelectedItems()));
 
-        startButton.setGraphic(fontAwesome.create(FontAwesome.Glyph.FORWARD).color(Color.GREEN));
+        startButton.setGraphic(TaskType.RUN.getIcon(Color.GREEN));
+        startButton.setOnAction(event -> doSearch());
 
-        cancelButton.setGraphic(fontAwesome.create(FontAwesome.Glyph.POWER_OFF).color(Color.RED));
-
+        cancelButton.setGraphic(TaskType.STOP.getIcon(Color.ORANGERED));
+        cancelButton.setOnAction(event -> doCancel());
     }
 
     private void initViewer()
@@ -182,35 +155,39 @@ public class SearchController
     /**
      * do database search
      */
-    @FXML
-    private void onSearch(ActionEvent actionEvent)
+    private void doSearch()
     {
-//        SearchParameters parameter = SearchParameters.getParameter(parameterFileNode.getText());
-//        Path databaseFile = parameter.getDatabase();
-//        if (Files.notExists(databaseFile)) {
-//            showAlert(Alert.AlertType.ERROR, "Database file: " + databaseFile + " not exist!");
-//            return;
-//        }
-//
-//        MainSearch search = new MainSearch(parameterFileNode.getText(), numTaskNode.getValue(), threadNode.getValue(), msFileListNode.getItems());
-//        this.searchTask = NodeUtils.createTask(search);
-//        taskProgressNode.getTasks().add(searchTask);
-//        try {
-//            Thread thread = new Thread(searchTask);
-//            thread.start();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        searchTask.setOnSucceeded(event -> System.gc());
-//        searchTask = null;
+        String parameterFile = parameterFileNode.getText();
+        Integer taskUnit = numTaskNode.getValue();
+        Integer threadCount = threadNode.getValue();
+        ObservableList<File> items = msFileListNode.getItems();
+        if (items.isEmpty())
+            return;
+
+        SearchParameters parameter = SearchParameters.getParameter(parameterFile);
+        Path database = parameter.getDatabase();
+        if (Files.notExists(database)) {
+            showAlert(Alert.AlertType.ERROR, "Database '" + database + "' not exist!");
+            return;
+        }
+
+        List<String> fileList = new ArrayList<>(items.size());
+        for (File item : items) {
+            fileList.add(item.getAbsolutePath());
+        }
+
+        searchTask = new FXSearchTask(parameterFile, taskUnit, threadCount, fileList);
+        taskProgressNode.getTasks().add(searchTask);
+        Thread thread = new Thread(searchTask);
+        thread.setDaemon(true);
+        thread.start();
+        searchTask.setOnSucceeded(event -> System.gc());
     }
 
-    public void onCancel(ActionEvent actionEvent)
+    private void doCancel()
     {
         if (searchTask != null && searchTask.isRunning()) {
             searchTask.cancel(true);
-            logger.info("The task is cancelled !!!");
         }
         System.gc();
     }
