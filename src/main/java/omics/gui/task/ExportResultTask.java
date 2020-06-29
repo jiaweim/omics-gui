@@ -110,7 +110,7 @@ public class ExportResultTask extends Task<Void>
         Set<MsDataId> idSet = new HashSet<>();
         for (File file : fileList) {
             updateMessage("Reading " + file.getName());
-            IdentResult result = IdentResult.read(file.toPath(), decoyTag, filterList);
+            IdentResult result = IdentResult.read(file.toPath(), decoyTag);
 
             // the original id is not unique across multiple files.
             for (MsDataId msDataID : result.getMsDataIds()) {
@@ -120,6 +120,7 @@ public class ExportResultTask extends Task<Void>
             if (parameters == null)
                 parameters = result.getParameters();
 
+            result.apply(filterList);
             ArrayListMultimap<String, PeptideSpectrumMatch> tmpMap = ArrayListMultimap.create();
             for (PeptideSpectrumMatch psm : result) {
                 String key = psm.getId(PSMKeyFunc.FILE_SCAN);
@@ -129,7 +130,6 @@ public class ExportResultTask extends Task<Void>
             for (String key : tmpMap.keySet()) {
                 List<PeptideSpectrumMatch> psmList = tmpMap.get(key);
                 psmList.sort(scoreComp);
-
                 List<PeptideSpectrumMatch> rankList = rank(psmList);
                 psmMap.putAll(key, rankList);
             }
@@ -172,6 +172,7 @@ public class ExportResultTask extends Task<Void>
                     psm.removeMeta(metaKey);
                 }
             }
+            psm.removeScore(Score.LOG_E_VALUE);
         }
         identResult.write(targetFile);
         return null;

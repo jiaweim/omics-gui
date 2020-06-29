@@ -15,6 +15,7 @@ import omics.gui.psm.SpectrumViewStyle;
 import omics.gui.psm.util.NodeUtils;
 import omics.gui.util.DoubleStringConverter2;
 import omics.gui.util.ExceptionAlert;
+import omics.gui.util.IdentFileUIUtils;
 import omics.gui.util.IntegerStringConverterV2;
 import omics.msdk.io.MsDataAccessor;
 import omics.msdk.model.MsDataFile;
@@ -27,12 +28,10 @@ import omics.pdk.ident.model.PeptideSpectrumMatch;
 import omics.pdk.ident.model.Score;
 import omics.pdk.ident.util.IonAnnotator;
 import omics.pdk.io.IdentResultReadingTask;
-import omics.pdk.io.ResultFileType;
 import omics.pdk.psm.PSMKeyFunc;
 import omics.pdk.ptm.glycosylation.GlycanComposition;
 import omics.pdk.ptm.glycosylation.ident.OxoniumDB;
-import omics.pdk.util.DoubleFormatter;
-import omics.pdk.util.ScientificScoreFormatter;
+import omics.pdk.util.DoubleScoreFormatter;
 import omics.pdk.util.ScoreFormatter;
 import omics.util.MetaKey;
 import omics.util.ms.MsnSpectrum;
@@ -488,7 +487,7 @@ public class PSMViewer extends TabPane
         if (yg.isSelected()) {
             String composition = psm.getMetaString(Delta.NAME);
             if (StringUtils.isNotEmpty(composition)) {
-                GlycanComposition glycanComposition = GlycanComposition.parseComposition(composition);
+                GlycanComposition glycanComposition = new GlycanComposition(composition);
                 IonAnnotator.annotateGlycanY(spectrum, tolerance, peptide.getMolecularMass(),
                         yg_minz.getValue(), yg_maxz.getValue(), glycanComposition);
             }
@@ -529,13 +528,7 @@ public class PSMViewer extends TabPane
     {
         FileChooser psmFileChooser = new FileChooser();
         psmFileChooser.setTitle("Choose PSM File");
-        psmFileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All", "*.*"),
-                new FileChooser.ExtensionFilter(ResultFileType.MzIdentML.getName(), ResultFileType.MzIdentML.getExtension()),
-                new FileChooser.ExtensionFilter(ResultFileType.MASCOT_CSV.getName(), ResultFileType.MASCOT_CSV.getExtension()),
-                new FileChooser.ExtensionFilter(ResultFileType.MASCOT_DAT.getName(), ResultFileType.MASCOT_DAT.getExtension()),
-                new FileChooser.ExtensionFilter(ResultFileType.OMICS_EXCEL.getName(), ResultFileType.OMICS_EXCEL.getExtension()),
-                new FileChooser.ExtensionFilter(ResultFileType.PEP_XML.getName(), ResultFileType.PEP_XML.getExtension()));
+        psmFileChooser.getExtensionFilters().addAll(IdentFileUIUtils.getIdentFileFilters());
 
         File file = psmFileChooser.showOpenDialog(getScene().getWindow());
         if (file == null)
@@ -670,10 +663,8 @@ public class PSMViewer extends TabPane
             });
 
             ScoreFormatter formatter = score.getFormatter();
-            if (formatter instanceof DoubleFormatter) {
-                NodeUtils.formatDoubleColumn(column, ((DoubleFormatter) formatter).getFormat());
-            } else if (formatter instanceof ScientificScoreFormatter) {
-                NodeUtils.formatDoubleColumn(column, ((ScientificScoreFormatter) formatter).getFormat());
+            if (formatter instanceof DoubleScoreFormatter) {
+                NodeUtils.formatDoubleColumn(column, ((DoubleScoreFormatter) formatter).getNumberFormat());
             }
 
             psmTableView.getColumns().add(column);

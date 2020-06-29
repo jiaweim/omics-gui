@@ -10,6 +10,7 @@ import javafx.stage.FileChooser;
 import omics.gui.TaskType;
 import omics.gui.task.ExportResultTask;
 import omics.gui.util.DoubleStringConverter2;
+import omics.gui.util.IdentFileUIUtils;
 import omics.gui.util.IntegerStringConverterV2;
 import omics.util.protein.database.util.DoShuffleDB;
 import omics.util.utils.StringUtils;
@@ -249,9 +250,7 @@ public class ExportResultPane extends SplitPane
     {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Select identification file");
-        chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("MzIdentML File", "*.mzid"),
-                new FileChooser.ExtensionFilter("All", "*.*"));
+        chooser.getExtensionFilters().addAll(IdentFileUIUtils.getIdentFileFilters());
         chooser.setSelectedExtensionFilter(chooser.getExtensionFilters().get(0));
 
         if (lastOpenFolder != null)
