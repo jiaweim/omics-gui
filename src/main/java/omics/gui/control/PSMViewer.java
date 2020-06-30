@@ -250,7 +250,7 @@ public class PSMViewer extends TabPane
         viewTab.setGraphic(TaskType.VIEW.getIcon());
         settingTab.setGraphic(TaskType.SETTING.getIcon());
 
-        double size = 20;
+//        double size = 20;
 //        openPSMButton.setGraphic(TaskType.READ_PSM.getIcon(size, Color.GREEN));
         openPSMButton.setGraphic(TaskType.READ_PSM.getIcon());
         openPSMButton.setTooltip(new Tooltip("Open PSM file"));
