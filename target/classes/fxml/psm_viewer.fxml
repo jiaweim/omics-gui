@@ -1,49 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<fx:root prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" type="TabPane" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="600.0" prefWidth="800.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE" type="TabPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
   <tabs>
     <Tab fx:id="viewTab">
          <content>
             <VBox>
                <children>
-                  <BorderPane prefHeight="25.0" VBox.vgrow="NEVER">
-                     <left>
-                        <HBox spacing="6.0" BorderPane.alignment="CENTER">
-                           <children>
-                              <Button fx:id="openPSMButton" graphicTextGap="0.0" mnemonicParsing="false" />
-                              <Button fx:id="openMSButton" graphicTextGap="0.0" mnemonicParsing="false" />
-                           </children>
-                           <BorderPane.margin>
-                              <Insets />
-                           </BorderPane.margin>
-                        </HBox>
-                     </left>
-                     <right>
-                        <HBox spacing="10.0" BorderPane.alignment="CENTER_RIGHT">
-                           <children>
-                              <CheckBox fx:id="showButton" mnemonicParsing="false" prefHeight="25.0" text="Show Spectrum" />
-                              <Button fx:id="updateSettingButton" mnemonicParsing="false" />
-                           </children>
-                        </HBox>
-                     </right>
-                     <VBox.margin>
-                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                     </VBox.margin>
-                  </BorderPane>
+                  <HBox spacing="6.0">
+                     <children>
+                        <Button fx:id="openPSMButton" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="36.0" />
+                        <Button fx:id="openMSButton" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="36.0" />
+                        <CheckBox fx:id="showButton" mnemonicParsing="false" prefHeight="36.0" text="Show Spectrum" />
+                     </children>
+                     <padding>
+                        <Insets bottom="2.0" top="2.0" />
+                     </padding>
+                  </HBox>
                     <SplitPane fx:id="splitPane" minHeight="0.0" minWidth="0.0" orientation="VERTICAL" VBox.vgrow="ALWAYS">
                         <items>
                               <TableView fx:id="psmTableView" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" />
                         </items>
                      <VBox.margin>
-                        <Insets bottom="2.0" left="2.0" right="2.0" />
+                        <Insets bottom="2.0" />
                      </VBox.margin>
                     </SplitPane>
                </children>
+               <padding>
+                  <Insets bottom="2.0" left="6.0" right="6.0" top="2.0" />
+               </padding>
             </VBox>
          </content>
     </Tab>
@@ -53,7 +56,7 @@
                <content>
                   <GridPane>
                     <columnConstraints>
-                      <ColumnConstraints hgrow="NEVER" minWidth="120.0" prefWidth="120.0" />
+                      <ColumnConstraints hgrow="NEVER" minWidth="99.0" prefWidth="99.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
@@ -78,105 +81,105 @@
                     </rowConstraints>
                      <children>
                         <Label text="Tolerance" />
-                        <HBox spacing="6.0" GridPane.columnIndex="1">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1">
                            <children>
                               <ComboBox fx:id="leftTol" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="rightTol" editable="true" prefWidth="100.0" />
                               <ChoiceBox fx:id="tolUnit" prefWidth="100.0" />
                            </children>
                         </HBox>
-                        <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
                            <children>
                               <ComboBox fx:id="y_minz" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="y_maxz" editable="true" prefWidth="100.0" />
                               <ColorPicker fx:id="y_color" prefWidth="100.0" />
                            </children>
                         </HBox>
-                        <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                            <children>
                               <ComboBox fx:id="a_minz" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="a_maxz" editable="true" prefWidth="100.0" />
                               <ColorPicker fx:id="a_color" prefWidth="100.0" />
                            </children>
                         </HBox>
-                        <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                            <children>
                               <ComboBox fx:id="b_minz" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="b_maxz" editable="true" prefWidth="100.0" />
                               <ColorPicker fx:id="b_color" prefWidth="100.0" />
                            </children>
                         </HBox>
-                        <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                            <children>
                               <ComboBox fx:id="c_minz" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="c_maxz" editable="true" prefWidth="100.0" />
                               <ColorPicker fx:id="c_color" prefWidth="100.0" />
                            </children>
                         </HBox>
-                        <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                            <children>
                               <ComboBox editable="true" prefWidth="100.0" fx:id="x_minz" />
                               <ComboBox editable="true" prefWidth="100.0" fx:id="x_maxz" />
                               <ColorPicker prefWidth="100.0" fx:id="x_color" />
                            </children>
                         </HBox>
-                        <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
                            <children>
                               <ComboBox fx:id="z_minz" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="z_maxz" editable="true" prefWidth="100.0" />
                               <ColorPicker fx:id="z_color" prefWidth="100.0" />
                            </children>
                         </HBox>
-                         <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
                              <children>
                                  <ComboBox fx:id="p_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="p_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="p_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
                              <children>
                                  <ComboBox fx:id="ph2o_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="ph2o_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="ph2o_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
                              <children>
                                  <ComboBox fx:id="pnh3_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="pnh3_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="pnh3_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
                              <children>
                                  <ComboBox fx:id="im_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="im_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="im_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="13">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="13">
                              <children>
                                  <ComboBox fx:id="bg_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="bg_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="bg_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="14">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="14">
                              <children>
                                  <ComboBox fx:id="yg_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="yg_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="yg_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="15">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="15">
                              <children>
                                  <ComboBox fx:id="bn_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="bn_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="bn_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="16">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="16">
                              <children>
                                  <ComboBox fx:id="yn_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="yn_maxz" editable="true" prefWidth="100.0" />
@@ -214,10 +217,11 @@
                            </children>
                         </HBox>
                         <CheckBox fx:id="filterPeak" mnemonicParsing="false" text="Peak Filter" GridPane.rowIndex="1" />
-                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <children>
                               <ComboBox fx:id="peakCount" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="binWidth" editable="true" prefWidth="100.0" />
+                              <Button fx:id="updateSettingButton" mnemonicParsing="false" />
                            </children>
                         </HBox>
                      </children>
