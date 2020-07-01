@@ -63,8 +63,10 @@
                       <RowConstraints minHeight="32.0" prefHeight="32.0" vgrow="NEVER" />
                         <RowConstraints minHeight="32.0" prefHeight="32.0" vgrow="NEVER" />
                         <RowConstraints minHeight="32.0" prefHeight="32.0" vgrow="NEVER" />
+                        <RowConstraints minHeight="32.0" prefHeight="32.0" vgrow="NEVER" />
                       <RowConstraints minHeight="32.0" prefHeight="32.0" vgrow="NEVER" />
                       <RowConstraints minHeight="32.0" prefHeight="32.0" vgrow="NEVER" />
+                        <RowConstraints minHeight="32.0" prefHeight="32.0" vgrow="NEVER" />
                         <RowConstraints minHeight="32.0" prefHeight="32.0" vgrow="NEVER" />
                         <RowConstraints minHeight="32.0" prefHeight="32.0" vgrow="NEVER" />
                         <RowConstraints minHeight="32.0" prefHeight="32.0" vgrow="NEVER" />
@@ -88,119 +90,119 @@
                               <ChoiceBox fx:id="tolUnit" prefWidth="100.0" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
                            <children>
                               <ComboBox fx:id="y_minz" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="y_maxz" editable="true" prefWidth="100.0" />
                               <ColorPicker fx:id="y_color" prefWidth="100.0" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                            <children>
                               <ComboBox fx:id="a_minz" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="a_maxz" editable="true" prefWidth="100.0" />
                               <ColorPicker fx:id="a_color" prefWidth="100.0" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                            <children>
                               <ComboBox fx:id="b_minz" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="b_maxz" editable="true" prefWidth="100.0" />
                               <ColorPicker fx:id="b_color" prefWidth="100.0" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                            <children>
                               <ComboBox fx:id="c_minz" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="c_maxz" editable="true" prefWidth="100.0" />
                               <ColorPicker fx:id="c_color" prefWidth="100.0" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
                            <children>
                               <ComboBox editable="true" prefWidth="100.0" fx:id="x_minz" />
                               <ComboBox editable="true" prefWidth="100.0" fx:id="x_maxz" />
                               <ColorPicker prefWidth="100.0" fx:id="x_color" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
                            <children>
                               <ComboBox fx:id="z_minz" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="z_maxz" editable="true" prefWidth="100.0" />
                               <ColorPicker fx:id="z_color" prefWidth="100.0" />
                            </children>
                         </HBox>
-                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
                              <children>
                                  <ComboBox fx:id="p_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="p_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="p_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
                              <children>
                                  <ComboBox fx:id="ph2o_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="ph2o_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="ph2o_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
                              <children>
                                  <ComboBox fx:id="pnh3_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="pnh3_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="pnh3_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="13">
                              <children>
                                  <ComboBox fx:id="im_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="im_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="im_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="13">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="14">
                              <children>
                                  <ComboBox fx:id="bg_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="bg_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="bg_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="14">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="15">
                              <children>
                                  <ComboBox fx:id="yg_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="yg_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="yg_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="15">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="17">
                              <children>
                                  <ComboBox fx:id="bn_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="bn_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="bn_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="16">
+                         <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="18">
                              <children>
                                  <ComboBox fx:id="yn_minz" editable="true" prefWidth="100.0" />
                                  <ComboBox fx:id="yn_maxz" editable="true" prefWidth="100.0" />
                                  <ColorPicker fx:id="yn_color" prefWidth="100.0" />
                              </children>
                          </HBox>
-                        <CheckBox fx:id="a" mnemonicParsing="false" text="a" GridPane.rowIndex="3" />
-                        <CheckBox fx:id="b" mnemonicParsing="false" text="b" GridPane.rowIndex="4" />
-                        <CheckBox fx:id="c" mnemonicParsing="false" text="c" GridPane.rowIndex="5" />
-                        <CheckBox mnemonicParsing="false" text="x" GridPane.rowIndex="6" fx:id="x" />
-                        <CheckBox fx:id="y" mnemonicParsing="false" text="y" GridPane.rowIndex="7" />
-                        <CheckBox fx:id="z" mnemonicParsing="false" text="z" GridPane.rowIndex="8" />
-                        <CheckBox fx:id="p" mnemonicParsing="false" text="p" GridPane.rowIndex="9" />
-                        <CheckBox fx:id="ph2o" mnemonicParsing="false" text="p-H2O" GridPane.rowIndex="10" />
-                        <CheckBox fx:id="pnh3" mnemonicParsing="false" text="p-NH3" GridPane.rowIndex="11" />
-                        <CheckBox fx:id="im" mnemonicParsing="false" text="immonium" GridPane.rowIndex="12" />
-                        <CheckBox fx:id="bg" mnemonicParsing="false" text="B" GridPane.rowIndex="13" />
-                        <CheckBox fx:id="yg" mnemonicParsing="false" text="Y" GridPane.rowIndex="14" />
-                        <CheckBox fx:id="bn" mnemonicParsing="false" text="b+HexNAc" GridPane.rowIndex="15" />
-                        <CheckBox fx:id="yn" mnemonicParsing="false" text="y+HexNAc" GridPane.rowIndex="16" />
-                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <CheckBox fx:id="a" mnemonicParsing="false" text="a" GridPane.rowIndex="4" />
+                        <CheckBox fx:id="b" mnemonicParsing="false" text="b" GridPane.rowIndex="5" />
+                        <CheckBox fx:id="c" mnemonicParsing="false" text="c" GridPane.rowIndex="6" />
+                        <CheckBox mnemonicParsing="false" text="x" GridPane.rowIndex="7" fx:id="x" />
+                        <CheckBox fx:id="y" mnemonicParsing="false" text="y" GridPane.rowIndex="8" />
+                        <CheckBox fx:id="z" mnemonicParsing="false" text="z" GridPane.rowIndex="9" />
+                        <CheckBox fx:id="p" mnemonicParsing="false" text="p" GridPane.rowIndex="10" />
+                        <CheckBox fx:id="ph2o" mnemonicParsing="false" text="p-H2O" GridPane.rowIndex="11" />
+                        <CheckBox fx:id="pnh3" mnemonicParsing="false" text="p-NH3" GridPane.rowIndex="12" />
+                        <CheckBox fx:id="im" mnemonicParsing="false" text="immonium" GridPane.rowIndex="13" />
+                        <CheckBox fx:id="bg" mnemonicParsing="false" text="B" GridPane.rowIndex="14" />
+                        <CheckBox fx:id="yg" mnemonicParsing="false" text="Y" GridPane.rowIndex="15" />
+                        <CheckBox fx:id="bn" mnemonicParsing="false" text="b+HexNAc" GridPane.rowIndex="17" />
+                        <CheckBox fx:id="yn" mnemonicParsing="false" text="y+HexNAc" GridPane.rowIndex="18" />
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                            <children>
                               <Label alignment="CENTER" prefWidth="100.0" text="Min Charge">
                                  <font>
@@ -216,12 +218,28 @@
                                  </font></Label>
                            </children>
                         </HBox>
-                        <CheckBox fx:id="filterPeak" mnemonicParsing="false" text="Peak Filter" GridPane.rowIndex="1" />
-                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <CheckBox fx:id="filterPeak" mnemonicParsing="false" text="Peak Filter" GridPane.rowIndex="2" />
+                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <children>
                               <ComboBox fx:id="peakCount" editable="true" prefWidth="100.0" />
                               <ComboBox fx:id="binWidth" editable="true" prefWidth="100.0" />
                               <Button fx:id="updateSettingButton" mnemonicParsing="false" />
+                           </children>
+                        </HBox>
+                        <CheckBox fx:id="deisotope" mnemonicParsing="false" text="Deisotope" GridPane.rowIndex="1" />
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <children>
+                              <ComboBox fx:id="deisoleftTol" editable="true" prefWidth="100.0" />
+                              <ComboBox fx:id="deisorightTol" editable="true" prefWidth="100.0" />
+                              <ChoiceBox fx:id="deisotolUnit" prefWidth="100.0" />
+                           </children>
+                        </HBox>
+                        <CheckBox fx:id="ncore" mnemonicParsing="false" text="N Core" GridPane.rowIndex="16" />
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="16">
+                           <children>
+                              <ComboBox fx:id="ncore_minz" editable="true" prefWidth="100.0" />
+                              <ComboBox fx:id="ncore_maxz" editable="true" prefWidth="100.0" />
+                              <ColorPicker fx:id="ncore_color" prefWidth="100.0" />
                            </children>
                         </HBox>
                      </children>

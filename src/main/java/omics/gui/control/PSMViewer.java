@@ -20,6 +20,7 @@ import omics.gui.util.IntegerStringConverterV2;
 import omics.msdk.io.MsDataAccessor;
 import omics.msdk.model.MsDataFile;
 import omics.msdk.model.SpectrumKeyFunc;
+import omics.msdk.processors.ZscoreDeisotoper;
 import omics.pdk.IdentResult;
 import omics.pdk.PSMColumn;
 import omics.pdk.ident.model.Delta;
@@ -96,6 +97,14 @@ public class PSMViewer extends TabPane
     @FXML
     private ChoiceBox<String> tolUnit;
     @FXML
+    private CheckBox deisotope;
+    @FXML
+    private ComboBox<Double> deisoleftTol;
+    @FXML
+    private ComboBox<Double> deisorightTol;
+    @FXML
+    private ChoiceBox<String> deisotolUnit;
+    @FXML
     private CheckBox filterPeak;
     @FXML
     private ComboBox<Integer> peakCount;
@@ -126,6 +135,8 @@ public class PSMViewer extends TabPane
     @FXML
     private CheckBox yg;
     @FXML
+    private CheckBox ncore;
+    @FXML
     private CheckBox bn;
     @FXML
     private CheckBox yn;
@@ -154,6 +165,8 @@ public class PSMViewer extends TabPane
     @FXML
     private ComboBox<Integer> yg_minz;
     @FXML
+    private ComboBox<Integer> ncore_minz;
+    @FXML
     private ComboBox<Integer> bn_minz;
     @FXML
     private ComboBox<Integer> yn_minz;
@@ -181,6 +194,8 @@ public class PSMViewer extends TabPane
     private ComboBox<Integer> bg_maxz;
     @FXML
     private ComboBox<Integer> yg_maxz;
+    @FXML
+    private ComboBox<Integer> ncore_maxz;
     @FXML
     private ComboBox<Integer> bn_maxz;
     @FXML
@@ -211,9 +226,12 @@ public class PSMViewer extends TabPane
     @FXML
     private ColorPicker yg_color;
     @FXML
+    private ColorPicker ncore_color;
+    @FXML
     private ColorPicker bn_color;
     @FXML
     private ColorPicker yn_color;
+
     //</editor-fold>
 
     private TaskProgressView<Task<?>> progressView = null;
@@ -222,6 +240,8 @@ public class PSMViewer extends TabPane
 
     private final PeptideFragmentAnnotator annotator = new PeptideFragmentAnnotator(new PeptideFragmenter(),
             Tolerance.abs(0.05));
+    private Tolerance fragmentTolerance = Tolerance.abs(0.05);
+    private Tolerance deisotopeTolerance = Tolerance.abs(0.02);
 
     private final OxoniumDB oxoniumDB = OxoniumDB.getInstance();
 
@@ -250,13 +270,10 @@ public class PSMViewer extends TabPane
         viewTab.setGraphic(TaskType.VIEW.getIcon());
         settingTab.setGraphic(TaskType.SETTING.getIcon());
 
-//        double size = 20;
-//        openPSMButton.setGraphic(TaskType.READ_PSM.getIcon(size, Color.GREEN));
         openPSMButton.setGraphic(TaskType.READ_PSM.getIcon());
         openPSMButton.setTooltip(new Tooltip("Open PSM file"));
         openPSMButton.setOnAction(event -> selectPSMFile());
 
-//        openMSButton.setGraphic(TaskType.READ_MS.getIcon(size, Color.DARKRED));
         openMSButton.setGraphic(TaskType.READ_MS.getIcon());
         openMSButton.setTooltip(new Tooltip("Open MS file"));
         openMSButton.setOnAction(event -> selectMSFile());
@@ -287,17 +304,18 @@ public class PSMViewer extends TabPane
         }
     }
 
-    private Tolerance getTolerance()
+    private Tolerance getTolerance(ComboBox<Double> left, ComboBox<Double> right, ChoiceBox<String> unit)
     {
-        Double left = this.leftTol.getValue();
-        Double right = rightTol.getValue();
-        String unitValue = tolUnit.getValue();
-        if (left == null || right == null)
+        Double leftValue = left.getValue();
+        Double rightValue = right.getValue();
+        String unitValue = unit.getValue();
+        if (leftValue == null || rightValue == null) {
             return null;
+        }
         if (unitValue.equals("ppm"))
-            return Tolerance.ppm(left, right);
+            return Tolerance.ppm(leftValue, rightValue);
         else
-            return Tolerance.abs(left, right);
+            return Tolerance.abs(leftValue, rightValue);
     }
 
     private void setValues(Ion ion, ColorPicker colorPicker, ComboBox<Integer> minZ, ComboBox<Integer> maxZ,
@@ -316,7 +334,26 @@ public class PSMViewer extends TabPane
         leftTol.setConverter(converter2);
         rightTol.setConverter(converter2);
         tolUnit.getItems().addAll("ppm", "Da");
-        setTolerance(Tolerance.abs(0.05));
+        setTolerance(fragmentTolerance);
+
+        deisoleftTol.setConverter(converter2);
+        deisorightTol.setConverter(converter2);
+        deisotolUnit.getItems().addAll("ppm", "Da");
+        deisoleftTol.setValue(0.02);
+        deisorightTol.setValue(0.02);
+        deisotolUnit.getSelectionModel().select(1);
+        deisotope.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                deisoleftTol.setDisable(false);
+                deisorightTol.setDisable(false);
+                deisotolUnit.setDisable(false);
+            } else {
+                deisoleftTol.setDisable(true);
+                deisorightTol.setDisable(true);
+                deisotolUnit.setDisable(true);
+            }
+        });
+        deisotope.setSelected(false);
         filterPeak.setSelected(false);
         peakCount.getItems().addAll(1, 5, 10, 15, 20);
         peakCount.setValue(10);
@@ -337,6 +374,7 @@ public class PSMViewer extends TabPane
         im.setSelected(false);
         bg.setSelected(false);
         yg.setSelected(false);
+        ncore.setSelected(false);
         bn.setSelected(false);
         yn.setSelected(false);
 
@@ -364,6 +402,12 @@ public class PSMViewer extends TabPane
         bg_maxz.setValue(1);
 
         charges.add(Integer.MAX_VALUE);
+
+        ncore_minz.getItems().addAll(charges);
+        ncore_minz.setValue(1);
+        ncore_color.setValue(viewStyle.getColor(Ion.Y));
+        ncore_maxz.getItems().addAll(charges);
+
         IntegerStringConverterV2 intConv = new IntegerStringConverterV2("Auto", Integer.MAX_VALUE);
         p_maxz.setConverter(intConv);
         p_maxz.setValue(Integer.MAX_VALUE);
@@ -373,15 +417,61 @@ public class PSMViewer extends TabPane
         pnh3_maxz.setValue(Integer.MAX_VALUE);
         yg_maxz.setConverter(intConv);
         yg_maxz.setValue(Integer.MAX_VALUE);
+        ncore_maxz.setConverter(intConv);
+        ncore_maxz.setValue(Integer.MAX_VALUE);
+
+        ncore.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                yg.setSelected(false);
+            }
+        });
+        yg.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                ncore.setSelected(false);
+            }
+        });
 
         updateSettings();
     }
 
+    private void showAlert(Alert.AlertType alertType, String msg)
+    {
+        Alert alert = new Alert(alertType, msg);
+        alert.showAndWait();
+    }
+
     private final List<PeptideIon> peptideIons = new ArrayList<>();
     private NPeaksPerBinFilter filter = null;
+    private ZscoreDeisotoper deisotoper = null;
 
     private void updateSettings()
     {
+        Tolerance tol = getTolerance(leftTol, rightTol, tolUnit);
+        if (tol == null) {
+            showAlert(Alert.AlertType.ERROR, "Please set tolerance");
+            return;
+        }
+        this.fragmentTolerance = tol;
+
+        if (deisotope.isSelected()) {
+            Tolerance tol2 = getTolerance(deisoleftTol, deisorightTol, deisotolUnit);
+            if (tol2 == null) {
+                showAlert(Alert.AlertType.ERROR, "Please set tolerance for deisotope");
+                return;
+            }
+            this.deisotopeTolerance = tol2;
+            deisotoper = new ZscoreDeisotoper(deisotopeTolerance);
+            deisotoper.setConvert2One(false);
+        } else {
+            deisotoper = null;
+        }
+
+        if (filterPeak.isSelected()) {
+            filter = new NPeaksPerBinFilter(peakCount.getValue(), binWidth.getValue());
+        } else {
+            filter = null;
+        }
+
         peptideIons.clear();
         // update ion types
         updateIon(a, Ion.a, a_minz, a_maxz, a_color);
@@ -390,19 +480,13 @@ public class PSMViewer extends TabPane
         updateIon(x, Ion.x, x_minz, x_maxz, x_color);
         updateIon(y, Ion.y, y_minz, y_maxz, y_color);
         updateIon(z, Ion.z, z_minz, z_maxz, z_color);
+
         updateIon(im, Ion.im, im_minz, im_maxz, im_color);
         updateIon(bn, Ion.b_HexNAc, bn_minz, bn_maxz, bn_color);
         updateIon(yn, Ion.y_HexNAc, yn_minz, yn_maxz, yn_color);
 
         annotator.setPeptideIonList(peptideIons);
-        Tolerance tol = getTolerance();
-        if (tol != null)
-            annotator.setTolerance(tol);
-        if (filterPeak.isSelected()) {
-            filter = new NPeaksPerBinFilter(peakCount.getValue(), binWidth.getValue());
-        } else {
-            filter = null;
-        }
+        annotator.setTolerance(fragmentTolerance);
 
         // update colors
         viewStyle.setColor(Ion.p, p_color.getValue());
@@ -422,7 +506,7 @@ public class PSMViewer extends TabPane
 
     private final Table<Ion, Integer, PeptideIon> peptideIonTable = HashBasedTable.create();
 
-    private void updateIon(CheckBox checkBox, Ion ionType, ComboBox<Integer> minCharge,
+    private void updateIon(CheckBox checkBox, Ion ion, ComboBox<Integer> minCharge,
             ComboBox<Integer> maxCharge, ColorPicker colorPicker)
     {
         if (!checkBox.isSelected()) {
@@ -436,14 +520,14 @@ public class PSMViewer extends TabPane
         }
 
         for (int i = minZ; i <= maxZ; i++) {
-            PeptideIon peptideIon = peptideIonTable.get(ionType, i);
+            PeptideIon peptideIon = peptideIonTable.get(ion, i);
             if (peptideIon == null) {
-                peptideIon = new PeptideIon(ionType, i);
-                peptideIonTable.put(ionType, i, peptideIon);
+                peptideIon = new PeptideIon(ion, i);
+                peptideIonTable.put(ion, i, peptideIon);
             }
             this.peptideIons.add(peptideIon);
         }
-        viewStyle.setColor(ionType, colorPicker.getValue());
+        viewStyle.setColor(ion, colorPicker.getValue());
     }
 
     private void initViewer()
@@ -475,14 +559,16 @@ public class PSMViewer extends TabPane
         }
         MsnSpectrum spectrum = spectrumMap.get(key);
         spectrum.clearAnnotations();
+        if (deisotoper != null) {
+            spectrum = spectrum.copy(deisotoper);
+        }
         if (filter != null) {
             spectrum = spectrum.copy(filter);
         }
         annotator.annotate((PeakList) spectrum, peptide);
 
-        Tolerance tolerance = getTolerance();
         if (bg.isSelected()) {
-            IonAnnotator.annotateOxonium(spectrum, tolerance, oxoniumDB.getMarkers(),
+            IonAnnotator.annotateOxonium(spectrum, fragmentTolerance, oxoniumDB.getMarkers(),
                     bg_minz.getValue(), bg_maxz.getValue());
         }
 
@@ -490,23 +576,29 @@ public class PSMViewer extends TabPane
             String composition = psm.getMetaString(Delta.NAME);
             if (StringUtils.isNotEmpty(composition)) {
                 GlycanComposition glycanComposition = new GlycanComposition(composition);
-                IonAnnotator.annotateGlycanY(spectrum, tolerance, peptide.getMolecularMass(),
+                IonAnnotator.annotateGlycanY(spectrum, fragmentTolerance, peptide.getMolecularMass(),
                         yg_minz.getValue(), yg_maxz.getValue(), glycanComposition);
             }
         }
 
+        if (ncore.isSelected()) {
+            Integer maxz = ncore_maxz.getValue();
+            if (maxz == Integer.MAX_VALUE)
+                maxz = spectrum.getPrecursorCharge();
+            IonAnnotator.annoNCore(spectrum, peptide.getMolecularMass(), fragmentTolerance, ncore_minz.getValue(), maxz);
+        }
+
         if (p.isSelected()) {
-            IonAnnotator.annotatePrecursor(spectrum, tolerance,
-                    p_minz.getValue(), p_maxz.getValue());
+            IonAnnotator.annotatePrecursor(spectrum, fragmentTolerance, p_minz.getValue(), p_maxz.getValue());
         }
 
         if (pnh3.isSelected()) {
-            IonAnnotator.annotatePrecursorNH3(spectrum, tolerance,
+            IonAnnotator.annotatePrecursorNH3(spectrum, fragmentTolerance,
                     pnh3_minz.getValue(), pnh3_maxz.getValue());
         }
 
         if (ph2o.isSelected()) {
-            IonAnnotator.annotatePrecursorH2O(spectrum, tolerance,
+            IonAnnotator.annotatePrecursorH2O(spectrum, fragmentTolerance,
                     ph2o_minz.getValue(), ph2o_maxz.getValue());
         }
 
@@ -544,6 +636,7 @@ public class PSMViewer extends TabPane
             this.identResult = proTask.getValue();
             Tolerance tol = identResult.getParameters().getFragmentTolerance();
             if (tol != null) {
+                this.fragmentTolerance = tol;
                 setTolerance(tol);
                 this.annotator.setTolerance(tol);
             }

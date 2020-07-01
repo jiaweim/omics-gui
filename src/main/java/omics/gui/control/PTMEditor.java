@@ -404,7 +404,7 @@ public class PTMEditor extends SplitPane
             if (StringUtils.isEmpty(nlShortName)) {
                 nlShortName = nlComposition.getFormula();
             }
-            neutralLoss = new NeutralLoss(nlName, nlShortName, nlComposition);
+            neutralLoss = NeutralLoss.of(nlName, nlShortName, nlComposition);
         }
         Specificity specificity = new Specificity(aaModel.getSelectedItem(), posModel.getSelectedItem(), neutralLoss);
         specificityTable.getItems().add(specificity);

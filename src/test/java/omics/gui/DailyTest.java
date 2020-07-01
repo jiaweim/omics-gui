@@ -1,8 +1,8 @@
 package omics.gui;
 
 import omics.pdk.ptm.glycosylation.ident.OxoniumDB;
-import omics.pdk.ptm.oglycan.util.OxoniumFilter;
-import omics.pdk.ptm.oglycan.util.OxoniumMarker;
+import omics.pdk.ptm.glycosylation.o_glyco.util.OxoniumFilter;
+import omics.pdk.ptm.glycosylation.o_glyco.util.OxoniumMarker;
 import omics.util.ms.peaklist.Tolerance;
 
 /**
