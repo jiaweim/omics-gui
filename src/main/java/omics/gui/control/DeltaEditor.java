@@ -157,7 +157,7 @@ public class DeltaEditor extends GridPane
                 compositionList.add((GlycanComposition) item);
             }
 
-            List<GlycanComposition> glycanCombinations = GlycanComposition.getGlycanCombinations(compositionList, countValue);
+            List<Delta> glycanCombinations = Delta.getCombinations(compositionList, countValue);
             buildList.getItems().addAll(glycanCombinations);
         } else {
             List<Delta> entryList = Delta.getCombinations(selectedUnitList.getItems(), countValue);

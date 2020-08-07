@@ -288,7 +288,7 @@ public class ParameterEditorPane extends VBox
             @Override
             public Protocol fromString(String string)
             {
-                return Protocol.nameOf(string);
+                return Protocol.ofName(string);
             }
         });
         protocolNode.getItems().addAll(Protocol.getAllProtocols());

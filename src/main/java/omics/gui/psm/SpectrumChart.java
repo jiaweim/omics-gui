@@ -42,8 +42,6 @@ import static omics.util.utils.ObjectUtils.checkNotNull;
  */
 public class SpectrumChart extends Pane
 {
-    private static final NumberFormat FORMAT_IONCURRENT = NumberFormatFactory.valueOf("0.0E0");
-
     /**
      * labels
      */
@@ -62,17 +60,17 @@ public class SpectrumChart extends Pane
 
     private PeakList<? extends PeakAnnotation> peakList = new DoublePeakList<>();
     // minimum m/z to display
-    private double minMz;
+    private double scaleMinMz;
     // maximum m/z to display
-    private double maxMz;
+    private double scaleMaxMz;
     // minimum intensity to display
     private double minIntensity;
     // maximum intensity to display
     private double maxIntensity;
 
     private double basePeakIntensity;
-    private double rawMinMz;
-    private double rawMaxMz;
+    private double minMz;
+    private double maxMz;
     // mz per pixel
     private double unitX;
     // intensity value per pixel
@@ -86,8 +84,8 @@ public class SpectrumChart extends Pane
     public SpectrumChart(SpectrumViewStyle config)
     {
         this.config = config;
-        widthProperty().addListener((observable, oldValue, newValue) -> draw());
-        heightProperty().addListener((observable, oldValue, newValue) -> draw());
+        widthProperty().addListener((observable, oldValue, newValue) -> repaint());
+        heightProperty().addListener((observable, oldValue, newValue) -> repaint());
         addEvent();
     }
 
@@ -152,18 +150,13 @@ public class SpectrumChart extends Pane
             }
         });
 
-//        setOnMouseExited(event -> {
-//            mzProperty.set(0);
-//            intensityProperty.set(0);
-//        });
-
         setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                 minIntensity = 0;
                 maxIntensity = basePeakIntensity;
-                minMz = rawMinMz;
-                maxMz = rawMaxMz;
-                draw();
+                scaleMinMz = minMz;
+                scaleMaxMz = maxMz;
+                repaint();
             }
         });
 
@@ -203,12 +196,10 @@ public class SpectrumChart extends Pane
                 if (maxX <= leftXLoc || x >= rightXLoc || y >= bottomYLoc || maxY <= middleYLoc)
                     return;
 
-//                System.out.println(minMz + "\t" + maxMz + "\t" + leftXLoc + "\t" + rightXLoc + "\t" + x + "\t" + maxX);
-
-                double newMinMz = minMz;
+                double newMinMz = scaleMinMz;
                 if (x > leftXLoc)
                     newMinMz = getMz(x);
-                double newMaxMz = maxMz;
+                double newMaxMz = scaleMaxMz;
                 if (maxX < rightXLoc)
                     newMaxMz = getMz(maxX);
 
@@ -220,13 +211,12 @@ public class SpectrumChart extends Pane
                 if (maxY < bottomYLoc)
                     newMinIntensity = getIntensity(maxY);
 
-                this.minMz = newMinMz;
-                this.maxMz = newMaxMz;
+                this.scaleMinMz = newMinMz;
+                this.scaleMaxMz = newMaxMz;
                 this.minIntensity = newMinIntensity;
                 this.maxIntensity = newMaxIntensity;
-//                System.out.println(minMz + "\t" + maxMz + "\t" + leftXLoc + "\t" + rightXLoc + "\t" + x + "\t" + maxX);
 
-                draw();
+                repaint();
             }
         });
     }
@@ -262,16 +252,16 @@ public class SpectrumChart extends Pane
             return;
 
         this.peakList = peakList;
-        this.rawMinMz = peakList.getX(0);
-        this.rawMaxMz = peakList.getX(peakList.size() - 1);
+        this.minMz = peakList.getX(0);
+        this.maxMz = peakList.getX(peakList.size() - 1);
         this.basePeakIntensity = peakList.getBasePeakY();
 
         this.minIntensity = 0;
         this.maxIntensity = peakList.getBasePeakY();
-        this.minMz = rawMinMz;
-        this.maxMz = rawMaxMz;
+        this.scaleMinMz = minMz;
+        this.scaleMaxMz = maxMz;
 
-        draw();
+        repaint();
     }
 
     /**
@@ -282,10 +272,10 @@ public class SpectrumChart extends Pane
         if (peakList.isEmpty())
             return;
         this.peakList.clear();
-        draw();
+        repaint();
     }
 
-    private void draw()
+    private void repaint()
     {
         getChildren().clear();
         if (peakList == null || peakList.isEmpty()) {
@@ -295,24 +285,6 @@ public class SpectrumChart extends Pane
         drawAxis();
         drawPeaks();
         addAnnotation();
-    }
-
-    /**
-     * suitable tick count for the width
-     *
-     * @return major and minor tick count
-     */
-    private Pair<Integer, Integer> getTickCount()
-    {
-        double width = getWidth();
-        int count = (int) width / config.getPixelForEachTick();
-        if (count < 100) {
-            int major = (int) Math.floor(count / 5.);
-            return Pair.create(major, 5);
-        } else {
-            int major = (int) Math.floor(count / 10.);
-            return Pair.create(major, 10);
-        }
     }
 
     private void drawAxis()
@@ -405,16 +377,16 @@ public class SpectrumChart extends Pane
         Color tickColor = config.getTickColor();
         Font tickLabelFont = config.getTickLabelFont();
 
-        Pair<Integer, Integer> tickCount = getTickCount();
+        Pair<Integer, Integer> tickCount = SpectrumChartUtils.getTickCount(getWidth(), config.getPixelForEachTick());
         int majorTickCount = tickCount.getFirst();
         int minorTickCount = tickCount.getSecond();
 
-        double range = calRange(minMz, maxMz, majorTickCount);
+        double range = SpectrumChartUtils.calRange(scaleMinMz, scaleMaxMz, majorTickCount);
 //        System.out.println(minMz + "\t" + maxMz + "\t" + majorTickCount + "\t" + range);
-        this.minMz = range * Math.floor(minMz / range);
-        this.maxMz = range * Math.ceil(maxMz / range);
-        this.unitX = (maxMz - minMz) / (rightXLoc - leftXLoc);
-        majorTickCount = (int) Math.round((maxMz - minMz) / range);
+        this.scaleMinMz = range * Math.floor(scaleMinMz / range);
+        this.scaleMaxMz = range * Math.ceil(scaleMaxMz / range);
+        this.unitX = (scaleMaxMz - scaleMinMz) / (rightXLoc - leftXLoc);
+        majorTickCount = (int) Math.round((scaleMaxMz - scaleMinMz) / range);
 
 //        System.out.println(minMz + "\t" + maxMz + "\t" + majorTickCount + "\t" + range);
 
@@ -426,7 +398,7 @@ public class SpectrumChart extends Pane
         double yLoc = bottomYLoc + frameStrokeWidth + majorTickLength + tickLabelSpace;
         for (int i = 0; i <= majorTickCount; i++) {
             double x = leftXLoc + i * space;
-            double mz = minMz + i * range;
+            double mz = scaleMinMz + i * range;
             Text text = new Text(format.format(mz));
             text.setFont(tickLabelFont);
             text.setTextOrigin(VPos.TOP);
@@ -507,6 +479,8 @@ public class SpectrumChart extends Pane
         this.unitY = (maxIntensity - minIntensity) / (bottomYLoc - middleYLoc);
         double inUnit = (maxIntensity - minIntensity) / yMajorTickCount;
         double tickUnit = (bottomYLoc - middleYLoc) / yMajorTickCount;
+        NumberFormat inFormat = SpectrumChartUtils.getFormat(maxIntensity);
+
         for (int i = 0; i <= yMajorTickCount; i++) {
             double yLoc = NodeUtils.snap(bottomYLoc - tickUnit * i, tickWidth);
 
@@ -526,7 +500,7 @@ public class SpectrumChart extends Pane
                     yLoc - textY1.getLayoutBounds().getHeight() / 2);
 
             double inValue = minIntensity + inUnit * i;
-            Text textY2 = new Text(FORMAT_IONCURRENT.format(inValue));
+            Text textY2 = new Text(inFormat.format(inValue));
             textY2.setFont(tickLabelFont);
             textY2.setTextOrigin(VPos.TOP);
             textY2.relocate(xLocY2, yLoc - textY2.getLayoutBounds().getHeight() / 2);
@@ -567,7 +541,7 @@ public class SpectrumChart extends Pane
      */
     private double getMz(double x)
     {
-        return (x - leftXLoc) * unitX + minMz;
+        return (x - leftXLoc) * unitX + scaleMinMz;
     }
 
     private double getIntensity(double y)
@@ -582,7 +556,7 @@ public class SpectrumChart extends Pane
      */
     private double getX(double mz)
     {
-        return leftXLoc + (mz - minMz) / unitX;
+        return leftXLoc + (mz - scaleMinMz) / unitX;
     }
 
     private double getY(double intensity)
@@ -604,7 +578,7 @@ public class SpectrumChart extends Pane
             double mz = peakList.getX(i);
             double in = peakList.getY(i);
 
-            if (mz < minMz || mz > maxMz)
+            if (mz < scaleMinMz || mz > scaleMaxMz)
                 continue;
             if (in < minIntensity)
                 continue;
@@ -633,7 +607,7 @@ public class SpectrumChart extends Pane
 
             double mz = peakList.getX(i);
             double in = peakList.getY(i);
-            if (mz < minMz || mz > maxMz)
+            if (mz < scaleMinMz || mz > scaleMaxMz)
                 continue;
             if (in < minIntensity)
                 continue;
@@ -697,25 +671,6 @@ public class SpectrumChart extends Pane
             }
         }
     }
-
-
-    /**
-     * Calculate a suitable range for the given data.
-     *
-     * @param minMz      minimum m/z
-     * @param maxMz      maximum m/z
-     * @param rangeCount number of major tick count (in fact, it is the number of major range count)
-     * @return major tick range
-     */
-    private static double calRange(double minMz, double maxMz, int rangeCount)
-    {
-        double size = (maxMz - minMz) / rangeCount;
-
-        double x = Math.floor(Math.log10(size));
-        double powx = Math.pow(10, x);
-        return Math.ceil(size / powx) * powx;
-    }
-
 
     private String getAnnotationsLabel(List<? extends PeakAnnotation> annotations)
     {

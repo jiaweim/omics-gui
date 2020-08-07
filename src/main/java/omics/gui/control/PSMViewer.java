@@ -319,7 +319,7 @@ public class PSMViewer extends TabPane
     }
 
     private void setValues(Ion ion, ColorPicker colorPicker, ComboBox<Integer> minZ, ComboBox<Integer> maxZ,
-            List<Integer> values)
+                           List<Integer> values)
     {
         colorPicker.setValue(viewStyle.getColor(ion));
         minZ.getItems().addAll(values);
@@ -507,7 +507,7 @@ public class PSMViewer extends TabPane
     private final Table<Ion, Integer, PeptideIon> peptideIonTable = HashBasedTable.create();
 
     private void updateIon(CheckBox checkBox, Ion ion, ComboBox<Integer> minCharge,
-            ComboBox<Integer> maxCharge, ColorPicker colorPicker)
+                           ComboBox<Integer> maxCharge, ColorPicker colorPicker)
     {
         if (!checkBox.isSelected()) {
             return;
@@ -575,7 +575,7 @@ public class PSMViewer extends TabPane
         if (yg.isSelected()) {
             String composition = psm.getMetaString(Delta.NAME);
             if (StringUtils.isNotEmpty(composition)) {
-                GlycanComposition glycanComposition = new GlycanComposition(composition);
+                GlycanComposition glycanComposition = GlycanComposition.fromName(composition);
                 IonAnnotator.annotateGlycanY(spectrum, fragmentTolerance, peptide.getMolecularMass(),
                         yg_minz.getValue(), yg_maxz.getValue(), glycanComposition);
             }
