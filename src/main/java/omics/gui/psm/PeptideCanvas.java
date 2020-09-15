@@ -12,7 +12,7 @@ import javafx.scene.text.FontWeight;
 import omics.gui.psm.util.NodeUtils;
 import omics.util.protein.Peptide;
 import omics.util.protein.ms.Ion;
-import omics.util.protein.ms.PeptideFragAnnotation;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,8 +37,8 @@ public class PeptideCanvas extends Canvas
     private static final Font labelFont = Font.font("Calibri", FontWeight.BOLD, 14);
 
     private Peptide peptide;
-    private final List<PeptideFragAnnotation> annotations = new ArrayList<>();
-    private final SpectrumViewStyle config = new SpectrumViewStyle();
+    private final List<PeptideFragmentAnnotation> annotations = new ArrayList<>();
+    private final PSMViewSettings config = new PSMViewSettings();
 
     public PeptideCanvas()
     {
@@ -53,12 +53,12 @@ public class PeptideCanvas extends Canvas
         heightProperty().addListener(event -> draw());
     }
 
-    public SpectrumViewStyle getConfig()
+    public PSMViewSettings getConfig()
     {
         return config;
     }
 
-    public void setPeptide(Peptide peptide, List<PeptideFragAnnotation> annotations)
+    public void setPeptide(Peptide peptide, List<PeptideFragmentAnnotation> annotations)
     {
         this.peptide = peptide;
 
@@ -106,20 +106,20 @@ public class PeptideCanvas extends Canvas
         double labelXLoc, labelYLoc;
         String label;
 
-        ListMultimap<Ion, PeptideFragAnnotation> annoMap = ArrayListMultimap.create();
-        for (PeptideFragAnnotation annotation : annotations) {
+        ListMultimap<Ion, PeptideFragmentAnnotation> annoMap = ArrayListMultimap.create();
+        for (PeptideFragmentAnnotation annotation : annotations) {
             annoMap.put(annotation.getIon(), annotation);
         }
 
         Set<Integer> processedSet = new HashSet<>();
         if (annoMap.containsKey(Ion.b)) {
-            List<PeptideFragAnnotation> annotations = annoMap.get(Ion.b);
+            List<PeptideFragmentAnnotation> annotations = annoMap.get(Ion.b);
 
             gc.setTextBaseline(VPos.TOP);
             gc.setStroke(config.getColor(Ion.b));
             gc.setFill(config.getColor(Ion.b));
 
-            for (PeptideFragAnnotation annotation : annotations) {
+            for (PeptideFragmentAnnotation annotation : annotations) {
                 int len = annotation.getFragment().size();
                 if (processedSet.contains(len))
                     continue;
@@ -144,13 +144,13 @@ public class PeptideCanvas extends Canvas
 
         processedSet.clear();
         if (annoMap.containsKey(Ion.y)) {
-            List<PeptideFragAnnotation> annotations = annoMap.get(Ion.y);
+            List<PeptideFragmentAnnotation> annotations = annoMap.get(Ion.y);
 
             gc.setTextBaseline(VPos.BOTTOM);
             gc.setStroke(config.getColor(Ion.y));
             gc.setFill(config.getColor(Ion.y));
 
-            for (PeptideFragAnnotation annotation : annotations) {
+            for (PeptideFragmentAnnotation annotation : annotations) {
                 int len = annotation.getFragment().size();
                 if (processedSet.contains(len))
                     continue;

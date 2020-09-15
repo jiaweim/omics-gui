@@ -5,6 +5,10 @@ ToolBar
     -fx-spacing: 4;
 }
 
+.split-pane > .split-pane-divider {
+    -fx-padding: 2px;
+}
+
 .tool-bar > .button{
     -fx-background-color:
         #c3c4c4,

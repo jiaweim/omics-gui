@@ -6,9 +6,10 @@ import javafx.stage.Stage;
 import omics.util.protein.Peptide;
 import omics.util.protein.PeptideFragment;
 import omics.util.protein.mod.PTM;
+import omics.util.protein.ms.BackboneAnnotation;
 import omics.util.protein.ms.FragmentType;
-import omics.util.protein.ms.Ion;
-import omics.util.protein.ms.PeptideFragAnnotation;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
+import omics.util.protein.ms.PeptideIon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,15 +33,15 @@ class PeptideChartTest extends Application
         PTM phospho = PTM.Phospho();
         Peptide peptide = new Peptide.Builder("AAAAAATAPPSPGPAQPGPR")
                 .addModification(10, phospho).build();
-        List<PeptideFragAnnotation> annotations = new ArrayList<>();
-        annotations.add(new PeptideFragAnnotation(Ion.b, 1, PeptideFragment.parse("A", FragmentType.FORWARD)));
-        annotations.add(new PeptideFragAnnotation(Ion.b, 1, PeptideFragment.parse("AA", FragmentType.FORWARD)));
-        annotations.add(new PeptideFragAnnotation(Ion.b, 1, PeptideFragment.parse("AAA", FragmentType.FORWARD)));
-        annotations.add(new PeptideFragAnnotation(Ion.b, 1, PeptideFragment.parse("AAAA", FragmentType.FORWARD)));
-        annotations.add(new PeptideFragAnnotation(Ion.b, 1, PeptideFragment.parse("AAAAAATAPPSPGPAQPGP", FragmentType.FORWARD)));
+        List<PeptideFragmentAnnotation> annotations = new ArrayList<>();
+        annotations.add(new BackboneAnnotation(PeptideIon.b(1), PeptideFragment.parse("A", FragmentType.FORWARD)));
+        annotations.add(new BackboneAnnotation(PeptideIon.b(1), PeptideFragment.parse("AA", FragmentType.FORWARD)));
+        annotations.add(new BackboneAnnotation(PeptideIon.b(1), PeptideFragment.parse("AAA", FragmentType.FORWARD)));
+        annotations.add(new BackboneAnnotation(PeptideIon.b(1), PeptideFragment.parse("AAAA", FragmentType.FORWARD)));
+        annotations.add(new BackboneAnnotation(PeptideIon.b(1), PeptideFragment.parse("AAAAAATAPPSPGPAQPGP", FragmentType.FORWARD)));
 
-        annotations.add(new PeptideFragAnnotation(Ion.y, 1, PeptideFragment.parse("R", FragmentType.REVERSE)));
-        annotations.add(new PeptideFragAnnotation(Ion.y, 1, PeptideFragment.parse("AAAAATAPPSPGPAQPGPR", FragmentType.REVERSE)));
+        annotations.add(new BackboneAnnotation(PeptideIon.b(1), PeptideFragment.parse("R", FragmentType.REVERSE)));
+        annotations.add(new BackboneAnnotation(PeptideIon.b(1), PeptideFragment.parse("AAAAATAPPSPGPAQPGPR", FragmentType.REVERSE)));
 
 //        peptide = Peptide.parse("SGRGGNFGFGDSRGGGGNFGPGPGSNFRWWWWWWWWWWW");
 

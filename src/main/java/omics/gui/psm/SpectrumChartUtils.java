@@ -1,9 +1,12 @@
 package omics.gui.psm;
 
+import omics.util.ms.peaklist.PeakAnnotation;
 import omics.util.utils.NumberFormatFactory;
 import omics.util.utils.Pair;
 
 import java.text.NumberFormat;
+import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * @author JiaweiMao
@@ -12,6 +15,19 @@ import java.text.NumberFormat;
  */
 public class SpectrumChartUtils
 {
+    public static String getAnnotationsLabel(List<? extends PeakAnnotation> annotations)
+    {
+        if (annotations.size() == 1) {
+            return annotations.get(0).getSymbol();
+        } else {
+            StringJoiner joiner = new StringJoiner(" ");
+            for (PeakAnnotation annotation : annotations) {
+                joiner.add(annotation.getSymbol());
+            }
+            return joiner.toString();
+        }
+    }
+
     /**
      * suitable tick count for the width
      *

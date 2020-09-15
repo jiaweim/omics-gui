@@ -1,8 +1,8 @@
 package omics.gui;
 
-import omics.pdk.ptm.glycosylation.ident.OxoniumDB;
-import omics.pdk.ptm.glycosylation.o_glyco.util.OxoniumFilter;
-import omics.pdk.ptm.glycosylation.o_glyco.util.OxoniumMarker;
+import omics.pdk.ptm.glyco.OxoniumMarker;
+import omics.pdk.ptm.glyco.ident.OxoniumDB;
+import omics.pdk.ptm.glyco.o_glyco.util.OxoniumFilter;
 import omics.util.ms.peaklist.Tolerance;
 
 /**
@@ -16,7 +16,7 @@ public class DailyTest
     void test()
     {
         OxoniumDB instance = OxoniumDB.getInstance();
-        for (OxoniumMarker marker : instance.getMarkers()) {
+        for (OxoniumMarker marker : instance.getItemList()) {
             System.out.println(marker.getName() + "\t" + marker.getMz());
         }
 

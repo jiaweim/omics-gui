@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.StackPane?>
+
+<fx:root dividerPositions="0.3" type="javafx.scene.control.SplitPane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <items>
+      <TreeView fx:id="itemTree" minWidth="120.0" />
+      <StackPane fx:id="optionPane" />
+   </items>
+</fx:root>

@@ -23,7 +23,7 @@ import omics.util.protein.Peptide;
 import omics.util.protein.mod.PTM;
 import omics.util.protein.mod.PTMResolver;
 import omics.util.protein.mod.Specificity;
-import omics.util.protein.ms.PeptideFragAnnotation;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
 import omics.util.protein.ms.PeptideFragmentAnnotator;
 import omics.util.protein.ms.PeptideFragmenter;
 import omics.util.protein.ms.PeptideIon;
@@ -130,7 +130,7 @@ class PeptideSpectrumChartTest extends Application
                 Peptide peptide = peptideSpectrumMatch.getPeptide();
 
                 spectrum.apply(new NPeaksPerBinFilter<>(12, 100));
-                PeakList<PeptideFragAnnotation> peakList = new FloatPeakList<>();
+                PeakList<PeptideFragmentAnnotation> peakList = new FloatPeakList<>();
                 peakList.addPeaksNoAnnotations(spectrum);
 
                 annotator.annotate(peakList, peptide, spectrum.getPrecursor().getCharge());

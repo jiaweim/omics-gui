@@ -5,11 +5,11 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import omics.util.ms.peaklist.PeakList;
+import omics.util.ms.peaklist.PeakListUtil;
 import omics.util.ms.peaklist.Tolerance;
-import omics.util.ms.peaklist.impl.PeakListUtil;
 import omics.util.protein.Peptide;
 import omics.util.protein.mod.PTM;
-import omics.util.protein.ms.PeptideFragAnnotation;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
 import omics.util.protein.ms.PeptideFragmentAnnotator;
 import omics.util.protein.ms.PeptideFragmenter;
 import omics.util.protein.ms.PeptideSpectrum;
@@ -17,8 +17,6 @@ import omics.util.protein.ms.PeptideSpectrum;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author JiaweiMao
@@ -43,7 +41,7 @@ class PeptideTableViewTest extends Application
         PeptideSpectrum spectrum = fragmenter.fragment(peptide, 2);
 
         //<editor-fold desc="peaklist">
-        PeakList<PeptideFragAnnotation> s = PeakListUtil.parsePeakList("101.07112 6912.72\n" +
+        PeakList<PeptideFragmentAnnotation> s = PeakListUtil.parsePeakList("101.07112 6912.72\n" +
                 "102.05532 20235.6\n" +
                 "110.07158 4466.21\n" +
                 "115.08688 104787\n" +
@@ -289,11 +287,11 @@ class PeptideTableViewTest extends Application
         PeptideFragmentAnnotator annotator = new PeptideFragmentAnnotator(fragmenter, Tolerance.abs(0.05));
         annotator.annotate(s, peptide, 2);
 
-        Map<PeptideFragAnnotation, Double> deltaMap = new HashMap<>();
+        Map<PeptideFragmentAnnotation, Double> deltaMap = new HashMap<>();
         int[] ids = s.getAnnotationIndexes();
         for (int id : ids) {
-            List<PeptideFragAnnotation> annotations = s.getAnnotations(id);
-            for (PeptideFragAnnotation annotation : annotations) {
+            List<PeptideFragmentAnnotation> annotations = s.getAnnotations(id);
+            for (PeptideFragmentAnnotation annotation : annotations) {
                 double delta = s.getX(id) - annotation.getTheoreticalMz();
                 deltaMap.put(annotation, delta);
             }

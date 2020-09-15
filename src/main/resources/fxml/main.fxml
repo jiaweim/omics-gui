@@ -1,115 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import org.controlsfx.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import org.controlsfx.control.TaskProgressView?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="omics.gui.SearchController">
-  <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-  </columnConstraints>
-  <rowConstraints>
-      <RowConstraints minHeight="20.0" prefHeight="20.0" />
-    <RowConstraints vgrow="ALWAYS" />
-      <RowConstraints percentHeight="8.0" />
-  </rowConstraints>
-   <children>
-      <MenuBar>
-        <menus>
-          <Menu mnemonicParsing="false" text="_File">
-            <items>
-                  <SeparatorMenuItem mnemonicParsing="false" />
-              <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" onAction="#showHelpInfo" text="_Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-      <TabPane prefHeight="900.0" prefWidth="700.0" tabClosingPolicy="UNAVAILABLE" GridPane.rowIndex="1">
-        <tabs>
-            <Tab closable="false" text="Search">
-               <content>
-                  <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="49.0" prefHeight="49.0" vgrow="NEVER" />
-                      <RowConstraints vgrow="NEVER" />
-                      <RowConstraints vgrow="ALWAYS" />
-                        <RowConstraints vgrow="NEVER" />
-                    </rowConstraints>
-                     <children>
-                        <HBox alignment="CENTER_RIGHT" spacing="10.0">
-                           <children>
-                              <Label text="Parameter File" />
-                              <TextField fx:id="parameterFileNode" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin></TextField>
-                              <Button fx:id="selectParameterFileButton" mnemonicParsing="false" prefWidth="30.0" />
-                           </children>
-                           <padding>
-                              <Insets bottom="6.0" left="6.0" right="10.0" top="6.0" />
-                           </padding>
-                        </HBox>
-                        <ListView fx:id="msFileListNode" GridPane.rowIndex="2">
-                           <padding>
-                              <Insets bottom="8.0" />
-                           </padding>
-                           <GridPane.margin>
-                              <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-                           </GridPane.margin></ListView>
-                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.rowIndex="1">
-                           <children>
-                              <Button fx:id="addMSFileButton" mnemonicParsing="false" prefHeight="36.0" prefWidth="36.0" />
-                              <Button fx:id="removeMSFileButton" mnemonicParsing="false" prefHeight="36.0" prefWidth="36.0" />
-                           </children>
-                           <GridPane.margin>
-                              <Insets left="6.0" right="6.0" />
-                           </GridPane.margin>
-                        </HBox>
-                        <HBox alignment="CENTER_RIGHT" spacing="6.0" GridPane.rowIndex="3">
-                           <children>
-                              <Label prefHeight="40.0" text="Threads" />
-                              <Spinner fx:id="threadNode" editable="true" prefWidth="80.0" />
-                              <Label text="Bag Size" />
-                              <Spinner fx:id="numTaskNode" prefWidth="80.0" />
-                              <Button fx:id="startButton" mnemonicParsing="false" />
-                              <Button fx:id="cancelButton" mnemonicParsing="false" />
-                           </children>
-                           <GridPane.margin>
-                              <Insets left="6.0" right="6.0" />
-                           </GridPane.margin>
-                           <padding>
-                              <Insets right="10.0" />
-                           </padding>
-                        </HBox>
-                     </children>
-                  </GridPane>
-               </content>
-            </Tab>
-            <Tab fx:id="reportTab" text="Report" />
-            <Tab fx:id="viewerTab" text="Viewer">
-            </Tab>
-          <Tab fx:id="parameterTab" text="Parameters">
-          </Tab>
-        </tabs>
-      </TabPane>
-      <TaskProgressView fx:id="taskProgressNode" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets bottom="6.0" left="6.0" right="6.0" />
-         </GridPane.margin>
-      </TaskProgressView>
-   </children>
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="omics.gui.controller.MainController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="20.0" prefHeight="20.0" />
+        <RowConstraints vgrow="ALWAYS" />
+        <RowConstraints minHeight="68.0" prefHeight="68.0" />
+    </rowConstraints>
+    <MenuBar>
+        <Menu mnemonicParsing="false" text="_File">
+            <SeparatorMenuItem mnemonicParsing="false" />
+         <MenuItem fx:id="settingMenu" mnemonicParsing="false" text="Settings..." />
+            <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit" />
+        </Menu>
+        <Menu mnemonicParsing="false" text="Edit">
+            <MenuItem mnemonicParsing="false" text="Delete" />
+        </Menu>
+        <Menu mnemonicParsing="false" onAction="#showHelpInfo" text="_Help">
+            <MenuItem mnemonicParsing="false" text="About" />
+        </Menu>
+    </MenuBar>
+    <TabPane prefHeight="900.0" prefWidth="700.0" tabClosingPolicy="UNAVAILABLE" GridPane.rowIndex="1">
+        <Tab closable="false" text="Search">
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="49.0" prefHeight="49.0" vgrow="NEVER" />
+                    <RowConstraints vgrow="NEVER" />
+                    <RowConstraints vgrow="ALWAYS" />
+                    <RowConstraints vgrow="NEVER" />
+                </rowConstraints>
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <padding>
+                        <Insets bottom="6.0" left="6.0" right="10.0" top="6.0" />
+                    </padding>
+                    <Label text="Parameter File" />
+                    <TextField fx:id="parameterFileNode" HBox.hgrow="ALWAYS" />
+                    <Button fx:id="selectParameterFileButton" mnemonicParsing="false" onAction="#selectParameterFile" prefWidth="30.0" />
+                </HBox>
+                <ListView fx:id="msFileListNode" GridPane.rowIndex="2">
+                    <padding>
+                        <Insets bottom="8.0" />
+                    </padding>
+                    <GridPane.margin>
+                        <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                    </GridPane.margin>
+                </ListView>
+                <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.rowIndex="1">
+                    <GridPane.margin>
+                        <Insets left="6.0" right="6.0" />
+                    </GridPane.margin>
+                    <Button fx:id="addMSFileButton" mnemonicParsing="false" onAction="#addMSFile" prefHeight="36.0" prefWidth="36.0" />
+                    <Button fx:id="removeMSFileButton" mnemonicParsing="false" prefHeight="36.0" prefWidth="36.0" />
+                </HBox>
+                <HBox alignment="CENTER_RIGHT" spacing="6.0" GridPane.rowIndex="3">
+                    <GridPane.margin>
+                        <Insets left="6.0" right="6.0" />
+                    </GridPane.margin>
+                    <padding>
+                        <Insets right="10.0" />
+                    </padding>
+                    <Label prefHeight="40.0" text="Threads" />
+                    <Spinner fx:id="threadNode" editable="true" prefWidth="80.0" />
+                    <Button fx:id="startButton" mnemonicParsing="false" />
+                    <Button fx:id="cancelButton" mnemonicParsing="false" />
+                </HBox>
+            </GridPane>
+        </Tab>
+        <Tab fx:id="reportTab" text="Report" />
+        <Tab fx:id="parameterTab" text="Parameters" />
+        <Tab fx:id="toolboxTab" text="Toolbox" />
+    </TabPane>
+    <TaskProgressView fx:id="taskProgressNode" GridPane.rowIndex="2">
+        <GridPane.margin>
+          <Insets bottom="6.0" left="6.0" right="6.0" />
+        </GridPane.margin>
+    </TaskProgressView>
 </GridPane>

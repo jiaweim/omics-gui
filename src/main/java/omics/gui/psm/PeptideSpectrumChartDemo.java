@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 import omics.msdk.model.MsDataFile;
 import omics.msdk.model.SpectrumKeyFunc;
 import omics.pdk.ident.util.IonAnnotator;
-import omics.pdk.ptm.glycosylation.ident.OxoniumDB;
+import omics.pdk.ptm.glyco.ident.OxoniumDB;
 import omics.util.ms.MsnSpectrum;
 import omics.util.ms.peaklist.PeakList;
 import omics.util.ms.peaklist.Tolerance;
@@ -66,7 +66,7 @@ public class PeptideSpectrumChartDemo extends Application
         annotator.annotate((PeakList) spectrum, peptide);
         IonAnnotator.annoNCore(spectrum, peptide.getMolecularMass(), ms2, 1, spectrum.getPrecursorCharge());
 
-        IonAnnotator.annotateOxonium(spectrum, ms2, OxoniumDB.getInstance().getMarkers(), 1, 1);
+        IonAnnotator.annotateOxonium(spectrum, ms2, OxoniumDB.getInstance().getItemList(), 1, 1);
 //        IonAnnotator.annotatePrecursor(msnSpectrum, ms2, 1, Integer.MAX_VALUE);
 
         Scene scene = new Scene(root, 1000, 500);

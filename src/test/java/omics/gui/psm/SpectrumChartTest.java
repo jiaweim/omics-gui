@@ -4,12 +4,12 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import omics.util.ms.peaklist.PeakList;
+import omics.util.ms.peaklist.PeakListUtil;
 import omics.util.ms.peaklist.Tolerance;
-import omics.util.ms.peaklist.impl.PeakListUtil;
 import omics.util.protein.Peptide;
 import omics.util.protein.mod.Modification;
 import omics.util.protein.mod.PTM;
-import omics.util.protein.ms.PeptideFragAnnotation;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
 import omics.util.protein.ms.PeptideFragmentAnnotator;
 import omics.util.protein.ms.PeptideFragmenter;
 
@@ -42,7 +42,7 @@ class SpectrumChartTest extends Application
         PeptideFragmenter fragmenter = PeptideFragmenter.EsiTrapFragmenter();
 
         //<editor-fold desc="peaklist">
-        PeakList<PeptideFragAnnotation> s = PeakListUtil.parsePeakList("101.07112 6912.72\n" +
+        PeakList<PeptideFragmentAnnotation> s = PeakListUtil.parsePeakList("101.07112 6912.72\n" +
                 "102.05532 20235.6\n" +
                 "110.07158 4466.21\n" +
                 "115.08688 104787\n" +
@@ -286,7 +286,7 @@ class SpectrumChartTest extends Application
         //</editor-fold>
 
         PeptideFragmentAnnotator annotator = new PeptideFragmentAnnotator(fragmenter, Tolerance.abs(0.05));
-        PeakList<PeptideFragAnnotation> annotate = annotator.annotate(s, peptide, 2);
+        PeakList<PeptideFragmentAnnotation> annotate = annotator.annotate(s, peptide, 2);
 
         SpectrumChart pane = new SpectrumChart();
         pane.setPeakList(annotate);

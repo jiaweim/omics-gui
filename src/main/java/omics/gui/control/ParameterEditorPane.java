@@ -50,7 +50,7 @@ import java.util.Set;
  * @version 1.0.0
  * @since 09 Dec 2019, 9:36 PM
  */
-public class ParameterEditorPane extends VBox
+public class ParameterEditorPane extends ScrollPane
 {
     private final PTMFactory ptmFactory = PTMFactory.getInstance();
     private final DeltaFactory deltaFactory = DeltaFactory.getInstance();
@@ -84,8 +84,8 @@ public class ParameterEditorPane extends VBox
      */
     @FXML
     private CheckBox nMChoose;
-    @FXML
-    private ComboBox<Integer> isoformNode;
+//    @FXML
+//    private ComboBox<Integer> isoformNode;
     @FXML
     private ComboBox<Integer> maxModNode;
     @FXML
@@ -115,15 +115,11 @@ public class ParameterEditorPane extends VBox
     @FXML
     private ComboBox<Integer> topN;
     @FXML
-    private ComboBox<Integer> minDenovoNode;
-    @FXML
     private ChoiceBox<Instrument> instruNode;
     @FXML
     private ChoiceBox<Dissociation> activationNode;
     @FXML
     private ChoiceBox<Protocol> protocolNode;
-    @FXML
-    private ChoiceBox<Double> carrerMassNode;
     @FXML
     private CheckBox moreFeaturesNode;
     @FXML
@@ -189,7 +185,7 @@ public class ParameterEditorPane extends VBox
         enzymeNode.setConverter(enzymeConvert);
         enzymeNode2.setConverter(enzymeConvert);
 
-        List<Enzyme> enzymeList = EnzymeFactory.getInstance().getEnzymeList();
+        List<Enzyme> enzymeList = EnzymeFactory.getInstance().getItemList();
         enzymeNode.getItems().addAll(enzymeList);
         enzymeNode2.getItems().addAll(enzymeList);
 
@@ -204,8 +200,8 @@ public class ParameterEditorPane extends VBox
         minLenNode.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(5, 40, 7));
         maxLenNode.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(5, 100, 40));
 
-        isoformNode.setConverter(new IntegerStringConverter());
-        isoformNode.getItems().add(128);
+//        isoformNode.setConverter(new IntegerStringConverter());
+//        isoformNode.getItems().add(128);
         maxModNode.setConverter(new IntegerStringConverterV2());
         maxModNode.getItems().addAll(1, 2, 3, 4);
 
@@ -241,9 +237,6 @@ public class ParameterEditorPane extends VBox
 
         topN.setConverter(new IntegerStringConverter());
         topN.getItems().addAll(1, 5, 10);
-
-        minDenovoNode.setConverter(new IntegerStringConverterV2());
-        minDenovoNode.getItems().addAll(Integer.MIN_VALUE, 0, 5, 10, 15, 20);
 
         instruNode.setConverter(new StringConverter<Instrument>()
         {
@@ -291,29 +284,29 @@ public class ParameterEditorPane extends VBox
                 return Protocol.ofName(string);
             }
         });
-        protocolNode.getItems().addAll(Protocol.getAllProtocols());
+        protocolNode.getItems().addAll(ProtocolFactory.getInstance().getItemList());
 
-        carrerMassNode.setConverter(new StringConverter<Double>()
-        {
-            @Override
-            public String toString(Double object)
-            {
-                if (object == PeriodicTable.PROTON_MASS)
-                    return "H";
-                if (object == 22.98922189)
-                    return "Na";
-                if (object == 38.96315989)
-                    return "K";
-                return object.toString();
-            }
-
-            @Override
-            public Double fromString(String string)
-            {
-                return Double.parseDouble(string);
-            }
-        });
-        carrerMassNode.getItems().addAll(PeriodicTable.PROTON_MASS, 22.98922189, 38.96315989);
+//        carrerMassNode.setConverter(new StringConverter<Double>()
+//        {
+//            @Override
+//            public String toString(Double object)
+//            {
+//                if (object == PeriodicTable.PROTON_MASS)
+//                    return "H";
+//                if (object == 22.98922189)
+//                    return "Na";
+//                if (object == 38.96315989)
+//                    return "K";
+//                return object.toString();
+//            }
+//
+//            @Override
+//            public Double fromString(String string)
+//            {
+//                return Double.parseDouble(string);
+//            }
+//        });
+//        carrerMassNode.getItems().addAll(PeriodicTable.PROTON_MASS, 22.98922189, 38.96315989);
 
         minPeakNode.getItems().addAll(10, 15, 20);
     }
@@ -363,11 +356,11 @@ public class ParameterEditorPane extends VBox
 
         this.deltaList4Search.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        this.deltaList.addAll(deltaFactory.getDeltaList());
+        this.deltaList.addAll(deltaFactory.getItemList());
         this.deltaList.sort(Comparator.comparing(Delta::getName));
         refreshDeltaListButton.setOnAction(event -> {
             deltaList.clear();
-            deltaList.addAll(deltaFactory.getDeltaList());
+            deltaList.addAll(deltaFactory.getItemList());
             this.deltaList.sort(Comparator.comparing(Delta::getName));
         });
 
@@ -418,7 +411,7 @@ public class ParameterEditorPane extends VBox
         }
 
         nMChoose.setSelected(parameters.isRemoveProteinNTermM());
-        isoformNode.setValue(parameters.getMaxNrVariantsPerPeptide());
+//        isoformNode.setValue(parameters.getMaxNrVariantsPerPeptide());
         maxModNode.setValue(parameters.getMaxModsPerPeptide());
 
         minLenNode.getValueFactory().setValue(parameters.getMinPeptideLength());
@@ -449,7 +442,7 @@ public class ParameterEditorPane extends VBox
         maxChargeNode.getValueFactory().setValue(parameters.getMaxCharge());
 
         topN.setValue(parameters.getNumberMatchesPerSpectrum());
-        minDenovoNode.setValue(parameters.getMinDeNovoScore());
+//        minDenovoNode.setValue(parameters.getMinDeNovoScore());
         minPeakNode.setValue(parameters.getMinNumberPeaksPerSpectrum());
         clearBButton.setSelected(parameters.isRemoveOxonium());
         clearYButton.setSelected(parameters.isRemoveGlycoPeptideIon());
@@ -457,7 +450,7 @@ public class ParameterEditorPane extends VBox
         instruNode.setValue(parameters.getInstrument());
         activationNode.setValue(parameters.getDissociation());
         protocolNode.setValue(parameters.getProtocol());
-        carrerMassNode.setValue(parameters.getChargeCarrierMass());
+//        carrerMassNode.setValue(parameters.getChargeCarrierMass());
 
         moreFeaturesNode.setSelected(parameters.addMoreFeatures());
         preferDeltaNode.setSelected(parameters.isPreferDelta());
@@ -533,7 +526,7 @@ public class ParameterEditorPane extends VBox
         }
 
         parameters.setRemoveProteinNTermM(nMChoose.isSelected());
-        parameters.setMaxNrVariantsPerPeptide(isoformNode.getValue());
+//        parameters.setMaxNrVariantsPerPeptide(isoformNode.getValue());
         parameters.setMaxModsPerPeptide(maxModNode.getValue());
         parameters.setMinPeptideLength(minLenNode.getValue());
         parameters.setMaxPeptideLength(maxLenNode.getValue());
@@ -564,12 +557,12 @@ public class ParameterEditorPane extends VBox
         parameters.setMaxCharge(maxChargeNode.getValue());
 
         parameters.setNumberMatchesPerSpectrum(topN.getSelectionModel().getSelectedItem());
-        parameters.setMinDeNovoScore(minDenovoNode.getValue());
+//        parameters.setMinDeNovoScore(minDenovoNode.getValue());
 
         parameters.setInstrument(instruNode.getSelectionModel().getSelectedItem());
         parameters.setDissociation(activationNode.getSelectionModel().getSelectedItem());
         parameters.setProtocol(protocolNode.getSelectionModel().getSelectedItem());
-        parameters.setChargeCarrierMass(carrerMassNode.getSelectionModel().getSelectedItem());
+//        parameters.setChargeCarrierMass(carrerMassNode.getSelectionModel().getSelectedItem());
         parameters.setAddMoreFeatures(moreFeaturesNode.isSelected());
 
         parameters.setMinNumberPeaksPerSpectrum(minPeakNode.getSelectionModel().getSelectedItem());

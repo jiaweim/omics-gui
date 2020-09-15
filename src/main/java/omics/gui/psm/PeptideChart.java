@@ -11,7 +11,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import omics.util.protein.Peptide;
 import omics.util.protein.ms.Ion;
-import omics.util.protein.ms.PeptideFragAnnotation;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,8 +37,8 @@ public class PeptideChart extends Pane
 
     private static final int LINE_WIDTH = 2;
     private Peptide peptide;
-    private final List<PeptideFragAnnotation> annotations = new ArrayList<>();
-    private SpectrumViewStyle config = new SpectrumViewStyle();
+    private final List<PeptideFragmentAnnotation> annotations = new ArrayList<>();
+    private PSMViewSettings config = new PSMViewSettings();
 
     public PeptideChart()
     {
@@ -46,7 +46,7 @@ public class PeptideChart extends Pane
         widthProperty().addListener((observable, oldValue, newValue) -> draw());
     }
 
-    public SpectrumViewStyle getConfig()
+    public PSMViewSettings getConfig()
     {
         return config;
     }
@@ -55,9 +55,9 @@ public class PeptideChart extends Pane
      * Set the Peptide and its annotation.
      *
      * @param peptide     {@link Peptide}
-     * @param annotations list of {@link PeptideFragAnnotation}
+     * @param annotations list of {@link PeptideFragmentAnnotation}
      */
-    public void setPeptide(Peptide peptide, List<PeptideFragAnnotation> annotations)
+    public void setPeptide(Peptide peptide, List<PeptideFragmentAnnotation> annotations)
     {
         this.peptide = peptide;
         this.annotations.clear();
@@ -68,9 +68,9 @@ public class PeptideChart extends Pane
     }
 
     /**
-     * set the {@link SpectrumViewStyle} for display.
+     * set the {@link PSMViewSettings} for display.
      */
-    public void setStyle(SpectrumViewStyle style)
+    public void setStyle(PSMViewSettings style)
     {
         this.config = style;
     }
@@ -121,17 +121,16 @@ public class PeptideChart extends Pane
         if (annotations.isEmpty())
             return;
 
-        ListMultimap<Ion, PeptideFragAnnotation> annotationMap = ArrayListMultimap.create();
-        for (PeptideFragAnnotation annotation : annotations) {
+        ListMultimap<Ion, PeptideFragmentAnnotation> annotationMap = ArrayListMultimap.create();
+        for (PeptideFragmentAnnotation annotation : annotations) {
             annotationMap.put(annotation.getIon(), annotation);
         }
 
         Set<Integer> processedSet = new HashSet<>();
         //region PeptideIonType.b
         if (annotationMap.containsKey(Ion.b)) {
-            List<PeptideFragAnnotation> annotations = annotationMap.get(Ion.b);
-
-            for (PeptideFragAnnotation annotation : annotations) {
+            List<PeptideFragmentAnnotation> annotations = annotationMap.get(Ion.b);
+            for (PeptideFragmentAnnotation annotation : annotations) {
 
                 int size = annotation.getFragment().size();
                 if (processedSet.contains(size))
@@ -163,9 +162,8 @@ public class PeptideChart extends Pane
 
         processedSet.clear();
         if (annotationMap.containsKey(Ion.y)) {
-            List<PeptideFragAnnotation> annotations = annotationMap.get(Ion.y);
-
-            for (PeptideFragAnnotation annotation : annotations) {
+            List<PeptideFragmentAnnotation> annotations = annotationMap.get(Ion.y);
+            for (PeptideFragmentAnnotation annotation : annotations) {
 
                 int size = annotation.getFragment().size();
                 if (processedSet.contains(size))

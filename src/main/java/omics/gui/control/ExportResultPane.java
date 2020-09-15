@@ -7,6 +7,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import omics.gui.Settings;
+import omics.gui.ShowAlert;
 import omics.gui.TaskType;
 import omics.gui.task.ExportResultTask;
 import omics.gui.util.DoubleStringConverter2;
@@ -28,7 +30,7 @@ import java.util.List;
  * @version 1.0.0
  * @since 20 Dec 2019, 10:54 AM
  */
-public class ExportResultPane extends SplitPane
+public class ExportResultPane extends SplitPane implements ShowAlert
 {
     public ExportResultPane()
     {
@@ -46,10 +48,6 @@ public class ExportResultPane extends SplitPane
 
     @FXML
     private CheckBox percolatorCheckNode;
-    @FXML
-    private TextField percolatorPathNode;
-    @FXML
-    private Button choosePercolatorNode;
     @FXML
     private TextField decoyTagNode;
     @FXML
@@ -88,6 +86,13 @@ public class ExportResultPane extends SplitPane
         this.taskProgressView = taskProgressView;
     }
 
+    private Settings settings;
+
+    public void setSettings(Settings settings)
+    {
+        this.settings = settings;
+    }
+
     @FXML
     private void initialize()
     {
@@ -95,7 +100,8 @@ public class ExportResultPane extends SplitPane
         addButton.setOnAction(event -> selectFile());
 
         removeButton.setGraphic(TaskType.DELETE.getIcon());
-        removeButton.setOnAction(event -> resultFileListNode.getItems().removeAll(resultFileListNode.getSelectionModel().getSelectedItems()));
+        removeButton.setOnAction(event -> resultFileListNode.getItems()
+                .removeAll(resultFileListNode.getSelectionModel().getSelectedItems()));
 
         resultFileListNode.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         resultFileListNode.setEditable(false);
@@ -111,28 +117,7 @@ public class ExportResultPane extends SplitPane
 
     private void initParameters()
     {
-        percolatorCheckNode.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                percolatorPathNode.setEditable(true);
-                percolatorPathNode.setDisable(false);
-                choosePercolatorNode.setDisable(false);
-            } else {
-                percolatorPathNode.setDisable(true);
-                choosePercolatorNode.setDisable(true);
-            }
-        });
         percolatorCheckNode.setSelected(false);
-        percolatorPathNode.setDisable(true);
-        choosePercolatorNode.setDisable(true);
-
-        choosePercolatorNode.setGraphic(TaskType.CHOOSE_FILE.getIcon());
-        choosePercolatorNode.setOnAction(event -> {
-            FileChooser chooser = new FileChooser();
-            chooser.setTitle("Runnable Percolator");
-            File file = chooser.showOpenDialog(getScene().getWindow());
-            if (file != null)
-                percolatorPathNode.setText(file.getAbsolutePath());
-        });
 
         decoyTagNode.setText(DoShuffleDB.DECOY_PROTEIN_PREFIX);
 
@@ -146,12 +131,12 @@ public class ExportResultPane extends SplitPane
         rankScoreNode.getItems().addAll(Integer.MIN_VALUE, 0, 10, 15, 20);
         rankScoreNode.setValue(20);
 
-        evalueNode.setConverter(new DoubleStringConverter2("No Limit", Double.MIN_VALUE));
-        evalueNode.getItems().addAll(Double.MIN_VALUE, 0.01, 0.05);
+        evalueNode.setConverter(new DoubleStringConverter2("No Limit", 1.0));
+        evalueNode.getItems().addAll(1.0, 0.01, 0.05);
         evalueNode.setValue(0.01);
         evalueNode.setTooltip(new Tooltip("The maximum e-value for PSM"));
 
-        deltaNode.setTooltip(new Tooltip("Keep only PSM with delta"));
+        deltaNode.setTooltip(new Tooltip("Keep only PSM with mass gap"));
 
         samesetNode.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -177,12 +162,6 @@ public class ExportResultPane extends SplitPane
         });
     }
 
-    private void showAlert(Alert.AlertType type, String msg)
-    {
-        Alert alert = new Alert(type, msg);
-        alert.showAndWait();
-    }
-
     /**
      * process and export search result.
      */
@@ -202,7 +181,7 @@ public class ExportResultPane extends SplitPane
 
         boolean usePercolator = percolatorCheckNode.isSelected();
         if (usePercolator) {
-            String path = percolatorPathNode.getText();
+            String path = settings.getPercolatorPath();
             File perPath = new File(path);
             if (!perPath.exists()) {
                 showAlert(Alert.AlertType.ERROR, "Please specify the percolator path");
@@ -212,7 +191,7 @@ public class ExportResultPane extends SplitPane
 
         Double fdr = fdrNode.getValue();
         if (fdr == null || fdr > 1 || fdr < 0) {
-            showAlert(Alert.AlertType.ERROR, "fdr should in range [0,1]");
+            showAlert(Alert.AlertType.ERROR, "FDR should in range [0,1]");
             return;
         }
 

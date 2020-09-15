@@ -14,7 +14,7 @@ import omics.util.protein.Peptide;
 import omics.util.protein.PeptideFragment;
 import omics.util.protein.ms.FragmentType;
 import omics.util.protein.ms.Ion;
-import omics.util.protein.ms.PeptideFragAnnotation;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
 import omics.util.protein.ms.PeptideSpectrum;
 import omics.util.utils.NumberFormatFactory;
 
@@ -37,7 +37,7 @@ public class PeptideTableView extends TableView
     private static NumberFormat massFormat = NumberFormatFactory.valueOf(4);
     // PeptideIonType, charge, size, delta mass
     private PeptideSpectrum iSpectrum;
-    private Map<PeptideFragAnnotation, Double> iMatchPeaks = new HashMap<>();
+    private Map<PeptideFragmentAnnotation, Double> iMatchPeaks = new HashMap<>();
     private String deltaUnit;
 
     public PeptideTableView(PeptideSpectrum aSpectrum)
@@ -45,7 +45,7 @@ public class PeptideTableView extends TableView
         this(aSpectrum, null, null);
     }
 
-    public PeptideTableView(PeptideSpectrum spectrum, Map<PeptideFragAnnotation, Double> matchPeaks, String deltaUnit)
+    public PeptideTableView(PeptideSpectrum spectrum, Map<PeptideFragmentAnnotation, Double> matchPeaks, String deltaUnit)
     {
         checkNotNull(spectrum);
 
@@ -118,13 +118,13 @@ public class PeptideTableView extends TableView
         Set<String> labels = new HashSet<>(); // all labels include delta mass
         //<editor-fold desc="populate value to map">
         for (int i = 0; i < iSpectrum.size(); i++) {
-            for (PeptideFragAnnotation annotation : iSpectrum.getAnnotations(i)) {
+            for (PeptideFragmentAnnotation annotation : iSpectrum.getAnnotations(i)) {
                 Ion peptideIonType = annotation.getIon();
 
                 // neutral Loss is not supported
-                if (annotation.hasNeutralLoss()) {
-                    continue;
-                }
+//                if (annotation.hasNeutralLoss()) {
+//                    continue;
+//                }
 
                 if (peptideIonType == Ion.p)
                     continue;

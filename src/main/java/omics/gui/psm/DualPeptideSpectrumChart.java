@@ -1,62 +1,74 @@
 package omics.gui.psm;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Cursor;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
+import javafx.stage.FileChooser;
+import omics.gui.psm.util.LabelPos;
 import omics.gui.psm.util.NodeUtils;
+import omics.gui.psm.util.Point2D;
+import omics.gui.psm.util.PointLabel;
+import omics.util.ms.peaklist.PeakAnnotation;
 import omics.util.ms.peaklist.PeakList;
 import omics.util.ms.peaklist.impl.DoublePeakList;
+import omics.util.protein.Peptide;
+import omics.util.protein.mod.ModAttachment;
+import omics.util.protein.mod.Modification;
+import omics.util.protein.mod.ModificationList;
+import omics.util.protein.ms.FragmentType;
+import omics.util.protein.ms.Ion;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
 import omics.util.utils.NumberFormatFactory;
 import omics.util.utils.Pair;
+import omics.util.utils.StringUtils;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.*;
 
 import static omics.util.utils.ObjectUtils.checkNotNull;
 
 /**
+ * Dual spectrum viewer.
+ *
  * @author JiaweiMao
  * @version 1.0.0
  * @since 05 Jun 2020, 12:20 PM
  */
 public class DualPeptideSpectrumChart extends Pane
 {
+    private static final String ANNO_LINE = "-fx-stroke-dash-array: 2 2;";
+
     private String label_Y1 = "Relative Abundance (%)";
     private String label_Y2 = "Intensity";
     private String label_X = "m/z";
-    private Font peakLabelFont = Font.font("Sans-Serif", FontWeight.NORMAL, 14);
-    private Font axisLabelFont = Font.font("Arial", FontWeight.SEMI_BOLD, 14);
-    private Font tickLabelFont = Font.font("Arial", FontWeight.SEMI_BOLD, 12);
-    private int tickWidth = 1;
-    private Color tickColor = Color.rgb(128, 128, 128);
-
-    private double majorTickLength = 8;
-    private double middleTickLength = 5;
-    private double minorTickLength = 2;
-
-    private int yMajorTickCount = 5;
-    private int yMinorTickCount = 5;
 
     private Insets axisLabelNumberPad = new Insets(2);
     private Insets axisTickLabelPad = new Insets(3);
 
-    private int frameStrokeWidth = 2;
-    private Color frameColor = Color.rgb(128, 128, 128);
     /**
      * padding around drawing area
      */
-    private Insets outerPad = new Insets(0, 6, 6, 6);
+    private final Insets outerPad = new Insets(0, 6, 6, 6);
 
     /**
      * start x of peak area
@@ -68,8 +80,10 @@ public class DualPeptideSpectrumChart extends Pane
     private double rightXLoc;
 
     private double topFrameYLoc;
+    /**
+     * lower bounds of the title area
+     */
     private double topTitleYLoc;
-    private double topPeptideYLoc;
     /**
      * top end of peak plotting area
      */
@@ -78,7 +92,6 @@ public class DualPeptideSpectrumChart extends Pane
      * y of middle line
      */
     private double middleYLoc;
-    private double bottomPeptideYLoc;
     private double bottomPeakYLoc;
     private double bottomTitleYLoc;
     private double bottomFrameYLoc;
@@ -86,10 +99,10 @@ public class DualPeptideSpectrumChart extends Pane
     private double titleRatio = 0.15;
     private double peptideRatio = 0.2;
 
-    private double peakRatio = 0.9;
+    private double peakRatio = 0.85;
     private double peakAreaHeight;
-    private int peakWidth = 1;
-    private Color peakColor = Color.rgb(90, 90, 90);
+
+    private PSMViewSettings settings = new PSMViewSettings();
 
     private int pixelForEachTick = 5;
 
@@ -100,11 +113,11 @@ public class DualPeptideSpectrumChart extends Pane
     /**
      * minimum m/z to display
      */
-    private double scaleMinMz;
+    private double scaleMinMz = 0;
     /**
      * maximum m/z to display
      */
-    private double scaleMaxMz;
+    private double scaleMaxMz = 1000;
     /**
      * base peak intensity of top peak list
      */
@@ -113,7 +126,6 @@ public class DualPeptideSpectrumChart extends Pane
      * base peak intensity of bottom peak list
      */
     private double bottomBasePeakIntensity;
-
     /**
      * min intensity to display in top panel
      */
@@ -142,6 +154,11 @@ public class DualPeptideSpectrumChart extends Pane
      * intensity per pixel of bottom panel
      */
     private double bottomUnitY;
+    /**
+     * lower bound of top peptide area
+     */
+    private double topPeptideYLoc;
+    private double bottomPeptideYLoc;
 
     private final DoubleProperty mzProperty = new SimpleDoubleProperty();
     private final DoubleProperty intensityProperty = new SimpleDoubleProperty();
@@ -152,6 +169,49 @@ public class DualPeptideSpectrumChart extends Pane
         heightProperty().addListener((observable, oldValue, newValue) -> repaint());
 
         addEvent();
+    }
+
+    /**
+     * setter of the left Y-axis title
+     *
+     * @param label_Y1 title for left Y-axis
+     */
+    public void setY1Title(String label_Y1)
+    {
+        this.label_Y1 = label_Y1;
+    }
+
+    /**
+     * setter of the right Y-axis title
+     *
+     * @param label_Y2 title for the right Y-axis
+     */
+    public void setY2Title(String label_Y2)
+    {
+        this.label_Y2 = label_Y2;
+    }
+
+    /**
+     * setter of X-axis title
+     *
+     * @param label_X title for the x-axis
+     */
+    public void setXTitle(String label_X)
+    {
+        this.label_X = label_X;
+    }
+
+    public void setViewSettings(PSMViewSettings settings)
+    {
+        this.settings = settings;
+    }
+
+    /**
+     * @return settings for PSM view
+     */
+    public PSMViewSettings getViewSettings()
+    {
+        return settings;
     }
 
     /**
@@ -285,6 +345,21 @@ public class DualPeptideSpectrumChart extends Pane
                 repaint();
             }
         });
+
+        MenuItem saveItem = new MenuItem("Save to PNG");
+        saveItem.setOnAction(event -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Save image to png file");
+            chooser.setInitialFileName("scan.png");
+            File file = chooser.showSaveDialog(getScene().getWindow());
+            if (file != null) {
+                NodeUtils.saveNodeAsPng(this, file.getAbsolutePath());
+            }
+        });
+        ContextMenu menu = new ContextMenu();
+        menu.getItems().add(saveItem);
+        menu.setAutoHide(true);
+        setOnContextMenuRequested(event -> menu.show(getScene().getWindow(), event.getSceneX(), event.getSceneY()));
     }
 
     private void adjustRectangle(double startX, double startY, double endX, double endY)
@@ -304,13 +379,64 @@ public class DualPeptideSpectrumChart extends Pane
         }
     }
 
+    /**
+     * set the x and y scale
+     */
+    private void resetScale()
+    {
+        topMinIntensity = bottomMinIntensity = 0;
+        if (topPeakList.isEmpty() && bottomPeakList.isEmpty()) {
+            minMz = 0;
+            maxMz = 1000;
+            topBasePeakIntensity = bottomBasePeakIntensity = 0;
+            topMaxIntensity = bottomMaxIntensity = 100;
+        } else {
+            if (!topPeakList.isEmpty() && !bottomPeakList.isEmpty()) {
+                minMz = Double.min(topPeakList.getX(0), bottomPeakList.getX(0));
+                maxMz = Double.max(topPeakList.getX(topPeakList.size() - 1),
+                        bottomPeakList.getX(bottomPeakList.size() - 1));
+                topMaxIntensity = topBasePeakIntensity = topPeakList.getBasePeakY();
+                bottomMaxIntensity = bottomBasePeakIntensity = bottomPeakList.getBasePeakY();
+            } else if (!topPeakList.isEmpty()) {
+                minMz = topPeakList.getX(0);
+                maxMz = topPeakList.getX(topPeakList.size() - 1);
+                topMaxIntensity = topBasePeakIntensity = topPeakList.getBasePeakY();
+                bottomBasePeakIntensity = 0;
+                bottomMaxIntensity = 100;
+            } else {
+                minMz = bottomPeakList.getX(0);
+                maxMz = bottomPeakList.getX(bottomPeakList.size() - 1);
+                bottomMaxIntensity = bottomBasePeakIntensity = bottomPeakList.getBasePeakY();
+                topBasePeakIntensity = 0;
+                topMaxIntensity = 100;
+            }
+        }
+        scaleMinMz = minMz;
+        scaleMaxMz = maxMz;
+    }
 
     private void repaint()
     {
         getChildren().clear();
         drawAxis();
-        drawTopPeakList();
-        drawBottomPeakList();
+
+        drawPeakList(topPeakList, true);
+        drawAnnotation(topPeakList, true);
+
+        drawPeakList(bottomPeakList, false);
+        drawAnnotation(bottomPeakList, false);
+
+        drawPeptide(topPeptide, topAnnotaions, topTitleYLoc, topPeptideYLoc, true);
+        drawPeptide(bottomPeptide, bottomAnnotations, bottomTitleYLoc, bottomPeptideYLoc, false);
+
+        double lineY = NodeUtils.snap(middleYLoc, settings.getFrameStrokeWidth());
+        Line line = new Line(leftXLoc, lineY, rightXLoc, lineY);
+        line.setStroke(settings.getFrameColor());
+        line.setStrokeWidth(settings.getFrameStrokeWidth());
+        getChildren().add(line);
+
+        drawTitle();
+        drawSubTitle();
     }
 
     private void drawAxis()
@@ -324,12 +450,18 @@ public class DualPeptideSpectrumChart extends Pane
         Text textTickY1 = new Text("100");
         Text textTickY2 = new Text("9.9E99");
 
+        Font axisLabelFont = settings.getAxisLabelFont();
+        Font tickLabelFont = settings.getTickLabelFont();
+
         textY1.setFont(axisLabelFont);
         textY2.setFont(axisLabelFont);
         textX.setFont(axisLabelFont);
 
         textTickY1.setFont(tickLabelFont);
         textTickY2.setFont(tickLabelFont);
+
+        int frameStrokeWidth = settings.getFrameStrokeWidth();
+        double majorTickLength = settings.getMajorTickLength();
 
         double areaHeight = height - outerPad.getBottom() - outerPad.getTop()
                 - frameStrokeWidth * 2
@@ -398,12 +530,12 @@ public class DualPeptideSpectrumChart extends Pane
                 frameRightXLoc - frameLeftXLoc, frameBottomYLoc - frameTopYLoc);
         rectangle.setStrokeWidth(frameStrokeWidth);
         rectangle.setFill(Color.WHITE);
-        rectangle.setStroke(frameColor);
+        rectangle.setStroke(settings.getFrameColor());
         getChildren().add(rectangle);
 
         double lineY = NodeUtils.snap(middleYLoc, frameStrokeWidth);
         Line line = new Line(leftXLoc, lineY, rightXLoc, lineY);
-        line.setStroke(frameColor);
+        line.setStroke(settings.getFrameColor());
         line.setStrokeWidth(frameStrokeWidth);
         getChildren().add(line);
 
@@ -413,6 +545,13 @@ public class DualPeptideSpectrumChart extends Pane
 
     private void drawXAxis()
     {
+        int frameStrokeWidth = settings.getFrameStrokeWidth();
+        double majorTickLength = settings.getMajorTickLength();
+        double middleTickLength = settings.getMiddleTickLength();
+        double minorTickLength = settings.getMinorTickLength();
+        int tickWidth = settings.getTickWidth();
+        Color tickColor = settings.getTickColor();
+
         Pair<Integer, Integer> tickCount = SpectrumChartUtils.getTickCount(getWidth(), pixelForEachTick);
         int majorTickCount = tickCount.getFirst();
         int minorTickCount = tickCount.getSecond();
@@ -423,6 +562,7 @@ public class DualPeptideSpectrumChart extends Pane
         this.unitX = (scaleMaxMz - scaleMinMz) / (rightXLoc - leftXLoc);
         majorTickCount = (int) Math.round((scaleMaxMz - scaleMinMz) / range);
 
+        Font tickLabelFont = settings.getTickLabelFont();
         int precision = -(int) Math.floor(Math.log10(range));
         if (precision < 0)
             precision = 0;
@@ -491,6 +631,15 @@ public class DualPeptideSpectrumChart extends Pane
 
     private void drawYAxis()
     {
+        Font tickLabelFont = settings.getTickLabelFont();
+        int frameStrokeWidth = settings.getFrameStrokeWidth();
+        double majorTickLength = settings.getMajorTickLength();
+        double middleTickLength = settings.getMiddleTickLength();
+        int yMajorTickCount = settings.getYMajorTickCount();
+
+        int tickWidth = settings.getTickWidth();
+        Color tickColor = settings.getTickColor();
+
         // y major tick
         double xLoc1 = leftXLoc - majorTickLength - frameStrokeWidth;
         double xLoc2 = leftXLoc - frameStrokeWidth;
@@ -569,6 +718,7 @@ public class DualPeptideSpectrumChart extends Pane
             getChildren().add(textY2Bottom);
         }
 
+        int yMinorTickCount = settings.getYMinorTickCount();
         int minorTickCount = yMajorTickCount * yMinorTickCount;
         topTickUnit = (middleYLoc - topPeakYLoc) / minorTickCount;
         bottomTickUnit = (bottomPeakYLoc - middleYLoc) / minorTickCount;
@@ -603,19 +753,258 @@ public class DualPeptideSpectrumChart extends Pane
         }
     }
 
-    private final PeakList<?> topPeakList = new DoublePeakList<>();
-    private final PeakList<?> bottomPeakList = new DoublePeakList<>();
+    private final PeakList<PeakAnnotation> topPeakList = new DoublePeakList<>();
+    private final PeakList<PeakAnnotation> bottomPeakList = new DoublePeakList<>();
+
+    private final List<PeptideFragmentAnnotation> topAnnotaions = new ArrayList<>();
+    private final List<PeptideFragmentAnnotation> bottomAnnotations = new ArrayList<>();
+
+    private final HashMap<String, String> annotatedPTMs = new HashMap<>();
+
+    /**
+     * @param ptmNameMap modifications to be annotated in the peptide view
+     */
+    public void setAnnotatedPTMs(Map<String, String> ptmNameMap)
+    {
+        annotatedPTMs.clear();
+        annotatedPTMs.putAll(ptmNameMap);
+    }
+
+    private String cropModificationName(String name)
+    {
+        if (name.length() > 2)
+            return name.substring(0, 2);
+        return name;
+    }
+
+    private Peptide topPeptide;
+    private Peptide bottomPeptide;
+
+    private void drawPeptide(Peptide peptide, List<PeptideFragmentAnnotation> annotations,
+                             double rangeTop, double rangeBottom, boolean isTop)
+    {
+        if (peptide == null)
+            return;
+
+        double width = rightXLoc - leftXLoc;
+        int length = peptide.size();
+
+        int pad_aa = settings.getAminoAcidPad();
+        double pads = pad_aa * 2 * length;
+        Font aaFont = settings.getAminoAcidFont();
+        Font aaRealFont = aaFont;
+        Text text = new Text("W");
+        text.setFont(aaFont);
+        double aaHeight = text.getLayoutBounds().getHeight();
+        double aaWidth = text.getLayoutBounds().getWidth();
+        if (aaWidth * length > (width - pads)) {
+            int newSize = (int) (aaFont.getSize() * (width - pads) / aaWidth * length);
+            aaRealFont = Font.font(aaFont.getFamily(), FontWeight.BOLD, newSize);
+            text.setFont(aaRealFont);
+            aaHeight = text.getLayoutBounds().getHeight();
+            aaWidth = text.getLayoutBounds().getWidth();
+        }
+
+        int aminoAcidModificationSpace = settings.getAminoAcidModificationSpace();
+        double y_aa = (rangeTop + rangeBottom - aaHeight) / 2;
+        double x_start = leftXLoc + (width - (aaWidth + pad_aa * 2) * length) / 2;
+
+        Font modificationFont = settings.getModificationFont();
+        text.setFont(modificationFont);
+        double height = text.getBoundsInLocal().getHeight();
+        double y_mod = isTop ? y_aa - aminoAcidModificationSpace - height : y_aa + aaHeight + aminoAcidModificationSpace;
+
+        for (int i = 0; i < peptide.size(); i++) {
+            String symbol = peptide.getSymbol(i).getSymbol();
+            Text aaText = new Text(symbol);
+            aaText.setFont(aaRealFont);
+            aaText.setTextOrigin(VPos.TOP);
+            double x_aa = x_start + (aaWidth + pad_aa * 2) * i + pad_aa;
+            aaText.relocate(x_aa, y_aa);
+            getChildren().add(aaText);
+
+            if (peptide.hasModificationAt(i)) {
+                ModificationList modList = peptide.getModificationsAt(i, ModAttachment.all);
+                for (Modification modification : modList) {
+                    String title = modification.getTitle();
+                    if (annotatedPTMs.containsKey(title)) {
+                        String mod = cropModificationName(annotatedPTMs.get(title));
+                        Text modText = new Text(mod);
+                        modText.setFont(settings.getModificationFont());
+                        modText.setTextOrigin(VPos.TOP);
+                        double x_mod = x_aa + aaText.getBoundsInLocal().getWidth() / 2 - modText.getBoundsInLocal().getWidth() / 2;
+                        modText.relocate(x_mod, y_mod);
+                        getChildren().add(modText);
+                        break;
+                    }
+                }
+
+            }
+        }
+
+        if (annotations.isEmpty())
+            return;
+
+        ArrayListMultimap<Ion, PeptideFragmentAnnotation> annoMap = ArrayListMultimap.create();
+        SetMultimap<FragmentType, Integer> annoSet = HashMultimap.create();
+        for (PeptideFragmentAnnotation annotation : annotations) {
+            annoMap.put(annotation.getIon(), annotation);
+            FragmentType fragmentType = annotation.getIon().getFragmentType();
+            int size = annotation.getFragment().size();
+            annoSet.put(fragmentType, size);
+        }
+
+        int lineWidth = settings.getPeptideAnnotationLineWidth();
+        int pad_aa_line = settings.getAminoAcidLineSpace();
+        int peptideLabelLineSpace = settings.getPeptideLabelLineSpace();
+        double y1 = NodeUtils.snap(y_aa - pad_aa_line, lineWidth);
+        double y2 = y_aa + aaHeight / 2;
+        double y3 = NodeUtils.snap(y_aa + aaHeight + pad_aa_line, lineWidth);
+        Set<Integer> sizes = annoSet.get(FragmentType.FORWARD);
+        for (Integer size : sizes) {
+            double x1 = x_start + (aaWidth + pad_aa * 2) * (size - 1) + pad_aa + aaWidth;
+            double x2 = NodeUtils.snap(x1 + pad_aa, lineWidth);
+
+            Polyline polyline = new Polyline(x1, y3, x2, y3, x2, y2);
+            polyline.setStroke(settings.getColor(Ion.b));
+            polyline.setStrokeWidth(settings.getPeptideAnnotationLineWidth());
+
+            getChildren().add(polyline);
+
+            String label = String.valueOf(size);
+            Text labelText = new Text(label);
+            labelText.setFont(settings.getAminoAcidLabelFont());
+            labelText.setTextOrigin(VPos.TOP);
+            labelText.setFill(settings.getColor(Ion.b));
+            labelText.relocate(x1, y3 + peptideLabelLineSpace);
+            getChildren().add(labelText);
+        }
+
+        sizes = annoSet.get(FragmentType.REVERSE);
+        for (Integer size : sizes) {
+            double x1 = x_start + (aaWidth + pad_aa * 2) * (length - size);
+            double x2 = x1 + pad_aa;
+            x1 = NodeUtils.snap(x1, lineWidth);
+
+            Color color = settings.getColor(Ion.y);
+
+            Polyline polyline = new Polyline(x1, y2, x1, y1, x2, y1);
+            polyline.setStroke(color);
+            polyline.setStrokeWidth(settings.getPeptideAnnotationLineWidth());
+
+            getChildren().add(polyline);
+
+            String label = String.valueOf(size);
+            Text labelText = new Text(label);
+            labelText.setFont(settings.getAminoAcidLabelFont());
+            labelText.setTextOrigin(VPos.TOP);
+            labelText.setFill(color);
+            labelText.relocate(x1 - labelText.getBoundsInLocal().getWidth() + pad_aa, y1 - peptideLabelLineSpace - labelText.getBoundsInLocal().getHeight());
+            getChildren().add(labelText);
+        }
+    }
+
+    private String topTitle;
+    private String bottomTitle;
+
+    public void setTitle(String topTitle, String bottomTitle)
+    {
+        this.topTitle = topTitle;
+        this.bottomTitle = bottomTitle;
+    }
+
+    private void drawTitle()
+    {
+        int titleLeftSpace = settings.getTitleLeftSpace();
+
+        double middleY = (topFrameYLoc + topTitleYLoc) / 2;
+        Text topTitleText = new Text(topTitle);
+        topTitleText.setTextOrigin(VPos.TOP);
+        topTitleText.setFont(settings.getTitleFont());
+        double height = topTitleText.getBoundsInLocal().getHeight();
+        topTitleText.relocate(leftXLoc + titleLeftSpace, middleY - height / 2);
+        getChildren().add(topTitleText);
+
+        middleY = (bottomFrameYLoc + bottomTitleYLoc) / 2;
+        Text bottomTitleText = new Text(bottomTitle);
+        bottomTitleText.setTextOrigin(VPos.TOP);
+        bottomTitleText.setFont(settings.getTitleFont());
+        bottomTitleText.relocate(leftXLoc + titleLeftSpace, middleY - height / 2);
+        getChildren().add(bottomTitleText);
+    }
+
+    private String topSubTitle;
+    private String bottomSubTitle;
+
+    public void setTopSubTitle(String topSubTitle)
+    {
+        this.topSubTitle = topSubTitle;
+    }
+
+    public void setBottomSubTitle(String bottomSubTitle)
+    {
+        this.bottomSubTitle = bottomSubTitle;
+    }
+
+    private void drawSubTitle()
+    {
+        int rightSpace = settings.getTitleLeftSpace();
+
+        if (StringUtils.isNotEmpty(topSubTitle)) {
+            double middleY = (topFrameYLoc + topTitleYLoc) / 2;
+            Text topTitleText = new Text(topSubTitle);
+            topTitleText.setTextOrigin(VPos.TOP);
+            topTitleText.setFont(settings.getTitleFont());
+            double height = topTitleText.getBoundsInLocal().getHeight();
+            topTitleText.relocate(rightXLoc - rightSpace - topTitleText.getBoundsInLocal().getWidth(), middleY - height / 2);
+            getChildren().add(topTitleText);
+        }
+
+        if (StringUtils.isNotEmpty(bottomSubTitle)) {
+            double middleY = (bottomFrameYLoc + bottomTitleYLoc) / 2;
+            Text bottomTitleText = new Text(bottomSubTitle);
+            bottomTitleText.setTextOrigin(VPos.TOP);
+            bottomTitleText.setFont(settings.getTitleFont());
+            double height = bottomTitleText.getBoundsInLocal().getHeight();
+            double width = bottomTitleText.getBoundsInLocal().getWidth();
+            bottomTitleText.relocate(rightXLoc - width - rightSpace, middleY - height / 2);
+            getChildren().add(bottomTitleText);
+        }
+    }
+
+    /**
+     * clear peak list and peptide
+     */
+    public void clear()
+    {
+        topPeakList.clear();
+        bottomPeakList.clear();
+        topPeptide = null;
+        bottomPeptide = null;
+        topTitle = null;
+        bottomTitle = null;
+        topSubTitle = null;
+        bottomSubTitle = null;
+        resetScale();
+        repaint();
+    }
 
     /**
      * set the peak list to be drawn.
      */
-    public void setPeakList(PeakList topPeakList, PeakList bottomPeakList)
+    public void set(PeakList<PeakAnnotation> topPeakList, Peptide topPeptide,
+                    PeakList<PeakAnnotation> bottomPeakList, Peptide bottomPeptide)
     {
         checkNotNull(topPeakList);
         checkNotNull(bottomPeakList);
+        checkNotNull(topPeptide);
+        checkNotNull(bottomPeptide);
 
         if (topPeakList.isEmpty() || bottomPeakList.isEmpty())
             return;
+
+        this.topPeptide = topPeptide;
+        this.bottomPeptide = bottomPeptide;
 
         this.topPeakList.clear();
         this.bottomPeakList.clear();
@@ -623,42 +1012,52 @@ public class DualPeptideSpectrumChart extends Pane
         this.topPeakList.addPeaks(topPeakList);
         this.bottomPeakList.addPeaks(bottomPeakList);
 
-        this.minMz = Double.min(topPeakList.getX(0), bottomPeakList.getX(0));
-        this.maxMz = Double.max(topPeakList.getX(topPeakList.size() - 1),
-                bottomPeakList.getX(bottomPeakList.size() - 1));
+        this.topAnnotaions.clear();
+        getPeptideAnnotations(topPeakList, topAnnotaions);
+        this.bottomAnnotations.clear();
+        getPeptideAnnotations(bottomPeakList, bottomAnnotations);
 
-        this.topBasePeakIntensity = topPeakList.getBasePeakY();
-        this.bottomBasePeakIntensity = bottomPeakList.getBasePeakY();
-
-        this.topMinIntensity = 0;
-        this.bottomMinIntensity = 0;
-
-        this.topMaxIntensity = topBasePeakIntensity;
-        this.bottomMaxIntensity = bottomBasePeakIntensity;
-
-        this.scaleMinMz = minMz;
-        this.scaleMaxMz = maxMz;
-
+        resetScale();
         repaint();
     }
 
-
-    private void drawTopPeakList()
+    private void getPeptideAnnotations(PeakList<PeakAnnotation> peakList, List<PeptideFragmentAnnotation> annotations)
     {
-        for (int i = 0; i < topPeakList.size(); i++) {
-            if (topPeakList.hasAnnotationsAt(i))
+        for (int i = 0; i < peakList.size(); i++) {
+            if (!peakList.hasAnnotationsAt(i))
                 continue;
-            double mz = topPeakList.getX(i);
-            double in = topPeakList.getY(i);
+            List<PeakAnnotation> annoList = peakList.getAnnotations(i);
+            for (PeakAnnotation peakAnnotation : annoList) {
+                if (peakAnnotation instanceof PeptideFragmentAnnotation) {
+                    PeptideFragmentAnnotation anno = (PeptideFragmentAnnotation) peakAnnotation;
+                    annotations.add(anno);
+                }
+            }
+        }
+    }
+
+    private void drawPeakList(PeakList<PeakAnnotation> peakList, boolean isTop)
+    {
+        double minIntensity = isTop ? topMinIntensity : bottomMinIntensity;
+        double peakWidth = settings.getPeakWidth();
+        int intWidth = (int) peakWidth;
+        Color peakColor = settings.getPeakColor();
+        for (int i = 0; i < peakList.size(); i++) {
+            if (peakList.hasAnnotationsAt(i))
+                continue;
+
+            double mz = peakList.getX(i);
+            double in = peakList.getY(i);
 
             if (mz <= scaleMinMz || mz >= scaleMaxMz)
                 continue;
-            if (in <= topMinIntensity)
+            if (in <= minIntensity)
                 continue;
-            double xPos = getX(mz);
-            double yPos = getTopY(in);
 
-            double x = NodeUtils.snap(xPos, peakWidth);
+            double xPos = getX(mz);
+            double yPos = isTop ? getTopY(in) : getBottomY(in);
+
+            double x = NodeUtils.snap(xPos, intWidth);
             Line line = new Line(x, yPos, x, middleYLoc);
             line.setStrokeWidth(peakWidth);
             line.setStroke(peakColor);
@@ -666,26 +1065,80 @@ public class DualPeptideSpectrumChart extends Pane
         }
     }
 
-    private void drawBottomPeakList()
+    private void drawAnnotation(PeakList<PeakAnnotation> peakList, boolean isTop)
     {
-        for (int i = 0; i < bottomPeakList.size(); i++) {
-            if (bottomPeakList.hasAnnotationsAt(i))
-                continue;
-            double mz = bottomPeakList.getX(i);
-            double in = bottomPeakList.getY(i);
+        double minIntensity = isTop ? topMinIntensity : bottomMinIntensity;
+        double annotatedPeakWidth = settings.getAnnotatedPeakWidth();
+        int intWidth = (int) annotatedPeakWidth;
+        Color peakColor = settings.getPeakColor();
 
+        HashMap<Point2D, Text> textMap = new HashMap<>();
+        for (int i = 0; i < peakList.size(); i++) {
+            if (!peakList.hasAnnotationsAt(i))
+                continue;
+
+            double mz = peakList.getX(i);
+            double in = peakList.getY(i);
             if (mz <= scaleMinMz || mz >= scaleMaxMz)
                 continue;
-            if (in <= bottomMinIntensity)
+            if (in <= minIntensity)
                 continue;
-            double xPos = getX(mz);
-            double yPos = getBottomY(in);
 
-            double x = NodeUtils.snap(xPos, peakWidth);
-            Line line = new Line(x, yPos, x, middleYLoc);
-            line.setStrokeWidth(peakWidth);
-            line.setStroke(peakColor);
+            double xPos = getX(mz);
+            double yPos = isTop ? getTopY(in) : getBottomY(in);
+
+            List<PeakAnnotation> annotations = peakList.getAnnotations(i);
+            PeakAnnotation peakAnnotation = annotations.get(0);
+            Ion ion = peakAnnotation.getIon();
+            Color color = settings.getColor(ion);
+            if (color == null)
+                color = peakColor;
+
+            double annoX = NodeUtils.snap(xPos, intWidth);
+            Line line = new Line(annoX, middleYLoc, annoX, yPos);
+            line.setStrokeWidth(annotatedPeakWidth);
+            line.setStroke(color);
             getChildren().add(line);
+
+            String label = SpectrumChartUtils.getAnnotationsLabel(annotations);
+            Text labelText = new Text(label);
+            labelText.setFont(settings.getPeakLabelFont());
+            labelText.setFill(color);
+            labelText.setTextOrigin(VPos.CENTER);
+            textMap.put(new Point2D(xPos, yPos), labelText);
+        }
+
+
+        Map<Point2D, Pair<Double, Double>> pointMap = new HashMap<>(textMap.size());
+        for (Map.Entry<Point2D, Text> entry : textMap.entrySet()) {
+            Text text = entry.getValue();
+            Bounds bounds = text.getLayoutBounds();
+            pointMap.put(entry.getKey(), Pair.create(bounds.getWidth(), bounds.getHeight()));
+        }
+
+        HashMap<Point2D, PointLabel> labelMap = isTop ?
+                PointLabel.placeLabelGrasp(pointMap, settings.getPeakLabelSpace(),
+                        leftXLoc, topPeptideYLoc, rightXLoc, middleYLoc) :
+                PointLabel.placeLabelGrasp(pointMap, LabelPos.getBottomPoses(), settings.getPeakLabelSpace(),
+                        leftXLoc, middleYLoc, rightXLoc, bottomPeptideYLoc);
+        for (Map.Entry<Point2D, PointLabel> entry : labelMap.entrySet()) {
+            Point2D key = entry.getKey();
+            PointLabel pointLabel = entry.getValue();
+            Point2D minLoc = pointLabel.getMinLoc();
+            LabelPos pos = pointLabel.getPos();
+            Text text = textMap.get(key);
+            text.relocate(minLoc.getX(), minLoc.getY());
+            getChildren().add(text);
+
+            // add line
+            if ((isTop && pos != LabelPos.TOP_CENTER1) || (!isTop && pos != LabelPos.BOTTOM_CENTER1)) {
+                Point2D linkPoint = pointLabel.getLinkPoint();
+                Line line = new Line(linkPoint.getX(), linkPoint.getY(), key.getX(), key.getY());
+                line.setStroke(text.getFill());
+                line.setStyle(ANNO_LINE);
+
+                getChildren().add(line);
+            }
         }
     }
 

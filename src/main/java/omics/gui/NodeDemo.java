@@ -3,9 +3,12 @@ package omics.gui;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import omics.gui.control.ToolBox;
+import omics.gui.control.DualPSMViewer;
+import omics.gui.control.SettingPane;
+import omics.gui.setting.PercolatorView;
+import omics.gui.util.FontAwesomeDemo;
 
 /**
  * @author JiaweiMao
@@ -23,7 +26,7 @@ public class NodeDemo extends Application
     public void start(Stage primaryStage)
     {
         BorderPane root = new BorderPane();
-        root.setCenter(new ToolBox());
+        root.setCenter(new SettingPane());
 
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);

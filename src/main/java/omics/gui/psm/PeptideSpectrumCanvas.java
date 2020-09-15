@@ -5,7 +5,7 @@ import javafx.scene.layout.BorderPane;
 import omics.util.ms.peaklist.PeakAnnotation;
 import omics.util.ms.peaklist.PeakList;
 import omics.util.protein.Peptide;
-import omics.util.protein.ms.PeptideFragAnnotation;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,13 +50,13 @@ public class PeptideSpectrumCanvas extends BorderPane
 
     public void setPeptideSpectrum(Peptide peptide, PeakList<PeakAnnotation> spectrum)
     {
-        List<PeptideFragAnnotation> pepAnnoList = new ArrayList<>();
+        List<PeptideFragmentAnnotation> pepAnnoList = new ArrayList<>();
         for (int i = 0; i < spectrum.size(); i++) {
             if (spectrum.hasAnnotationsAt(i)) {
                 List<? extends PeakAnnotation> annotations = spectrum.getAnnotations(i);
                 for (PeakAnnotation annotation : annotations) {
-                    if (annotation instanceof PeptideFragAnnotation) {
-                        PeptideFragAnnotation anno = (PeptideFragAnnotation) annotation;
+                    if (annotation instanceof PeptideFragmentAnnotation) {
+                        PeptideFragmentAnnotation anno = (PeptideFragmentAnnotation) annotation;
                         pepAnnoList.add(anno);
                     }
                 }

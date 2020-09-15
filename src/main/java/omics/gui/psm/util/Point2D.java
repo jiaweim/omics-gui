@@ -58,34 +58,66 @@ public class Point2D
         return y;
     }
 
+    /**
+     * Return top-left point of the label
+     *
+     * @param w     label width
+     * @param h     label height
+     * @param pos   point position
+     * @param space space between label and point
+     * @return top-left point of the label
+     */
     public Point2D getLocation(double w, double h, LabelPos pos, double space)
     {
         switch (pos) {
-
             case TOP_CENTER1:
                 return new Point2D(x - w * .5, y - h - space);
+            case BOTTOM_CENTER1:
+                return new Point2D(x - w * .5, y + space);
             case TOP_CENTER2:
                 return new Point2D(x - w * .5, y - h * 2 - space);
+            case BOTTOM_CENTER2:
+                return new Point2D(x - w * .5, y + h + space);
             case TOP_CENTER3:
                 return new Point2D(x - w * .5, y - h * 3 - space);
+            case BOTTOM_CENTER3:
+                return new Point2D(x - w * .5, y + h * 2 + space);
             case TOP_CENTER4:
                 return new Point2D(x - w * .5, y - h * 4 - space);
+            case BOTTOM_CENTER4:
+                return new Point2D(x - w * .5, y + h * 3 + space);
             case TOP_RIGHT1:
                 return new Point2D(x + space, y - h - space);
+            case BOTTOM_RIGHT1:
+                return new Point2D(x + space, y + space);
             case TOP_RIGHT2:
                 return new Point2D(x + space, y - h * 2 - space);
+            case BOTTOM_RIGHT2:
+                return new Point2D(x + space, y + h + space);
             case TOP_RIGHT3:
                 return new Point2D(x + space, y - h * 3 - space);
+            case BOTTOM_RIGHT3:
+                return new Point2D(x + space, y + h * 2 + space);
             case TOP_RIGHT4:
                 return new Point2D(x + space, y - h * 4 - space);
+            case BOTTOM_RIGHT4:
+                return new Point2D(x + space, y + h * 3 + space);
             case TOP_LEFT1:
                 return new Point2D(x - w - space, y - h - space);
+            case BOTTOM_LEFT1:
+                return new Point2D(x - w - space, y + space);
             case TOP_LEFT2:
                 return new Point2D(x - w - space, y - h * 2 - space);
+            case BOTTOM_LEFT2:
+                return new Point2D(x - w - space, y + h + space);
             case TOP_LEFT3:
                 return new Point2D(x - w - space, y - h * 3 - space);
+            case BOTTOM_LEFT3:
+                return new Point2D(x - w - space, y + h * 2 + space);
             case TOP_LEFT4:
                 return new Point2D(x - w - space, y - h * 4 - space);
+            case BOTTOM_LEFT4:
+                return new Point2D(x - w - space, y + h * 3 + space);
             default:
                 return new Point2D(x, y);
         }

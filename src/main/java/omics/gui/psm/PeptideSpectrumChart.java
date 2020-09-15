@@ -12,7 +12,7 @@ import omics.gui.psm.util.NodeUtils;
 import omics.util.ms.peaklist.PeakAnnotation;
 import omics.util.ms.peaklist.PeakList;
 import omics.util.protein.Peptide;
-import omics.util.protein.ms.PeptideFragAnnotation;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -74,7 +74,7 @@ public class PeptideSpectrumChart extends BorderPane
         setOnContextMenuRequested(event -> menu.show(getScene().getWindow(), event.getScreenX(), event.getScreenY()));
     }
 
-    public void setStyle(SpectrumViewStyle style)
+    public void setViewSettings(PSMViewSettings style)
     {
         this.peptideChart.setStyle(style);
         this.spectrumChart.setStyle(style);
@@ -108,18 +108,18 @@ public class PeptideSpectrumChart extends BorderPane
      */
     public void clearSpectrum()
     {
-        this.spectrumChart.clearPeakList();
+        this.spectrumChart.clear();
     }
 
     public void setPeptideSpectrum(Peptide peptide, PeakList<PeakAnnotation> spectrum)
     {
-        List<PeptideFragAnnotation> pepAnnoList = new ArrayList<>();
+        List<PeptideFragmentAnnotation> pepAnnoList = new ArrayList<>();
         for (int i = 0; i < spectrum.size(); i++) {
             if (spectrum.hasAnnotationsAt(i)) {
                 List<? extends PeakAnnotation> annotations = spectrum.getAnnotations(i);
                 for (PeakAnnotation annotation : annotations) {
-                    if (annotation instanceof PeptideFragAnnotation) {
-                        PeptideFragAnnotation anno = (PeptideFragAnnotation) annotation;
+                    if (annotation instanceof PeptideFragmentAnnotation) {
+                        PeptideFragmentAnnotation anno = (PeptideFragmentAnnotation) annotation;
                         pepAnnoList.add(anno);
                     }
                 }

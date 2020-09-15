@@ -29,7 +29,6 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import static omics.util.utils.ObjectUtils.checkNotNull;
 
@@ -69,8 +68,8 @@ public class SpectrumChart extends Pane
     private double maxIntensity;
 
     private double basePeakIntensity;
-    private double minMz;
-    private double maxMz;
+    private double minMz = 0;
+    private double maxMz = 1000;
     // mz per pixel
     private double unitX;
     // intensity value per pixel
@@ -79,9 +78,9 @@ public class SpectrumChart extends Pane
     private final DoubleProperty mzProperty = new SimpleDoubleProperty();
     private final DoubleProperty intensityProperty = new SimpleDoubleProperty();
 
-    private SpectrumViewStyle config;
+    private PSMViewSettings config;
 
-    public SpectrumChart(SpectrumViewStyle config)
+    public SpectrumChart(PSMViewSettings config)
     {
         this.config = config;
         widthProperty().addListener((observable, oldValue, newValue) -> repaint());
@@ -91,16 +90,16 @@ public class SpectrumChart extends Pane
 
     public SpectrumChart()
     {
-        this(new SpectrumViewStyle());
+        this(new PSMViewSettings());
     }
 
-    public void setStyle(SpectrumViewStyle style)
+    public void setStyle(PSMViewSettings style)
     {
         checkNotNull(style);
         this.config = style;
     }
 
-    public SpectrumViewStyle getConfig()
+    public PSMViewSettings getConfig()
     {
         return config;
     }
@@ -238,6 +237,23 @@ public class SpectrumChart extends Pane
         }
     }
 
+    private void resetScale()
+    {
+        minIntensity = 0;
+        if (peakList.isEmpty()) {
+            minMz = 0;
+            maxMz = 1000;
+            basePeakIntensity = 0;
+            maxIntensity = 100;
+        } else {
+            minMz = peakList.getX(0);
+            maxMz = peakList.getX(peakList.size() - 1);
+            maxIntensity = basePeakIntensity = peakList.getBasePeakY();
+        }
+        scaleMinMz = minMz;
+        scaleMaxMz = maxMz;
+    }
+
 
     /**
      * set the peak list to be drawn.
@@ -250,28 +266,20 @@ public class SpectrumChart extends Pane
 
         if (peakList.isEmpty())
             return;
-
         this.peakList = peakList;
-        this.minMz = peakList.getX(0);
-        this.maxMz = peakList.getX(peakList.size() - 1);
-        this.basePeakIntensity = peakList.getBasePeakY();
-
-        this.minIntensity = 0;
-        this.maxIntensity = peakList.getBasePeakY();
-        this.scaleMinMz = minMz;
-        this.scaleMaxMz = maxMz;
-
+        resetScale();
         repaint();
     }
 
     /**
      * Clear all peaks in the pane.
      */
-    public void clearPeakList()
+    public void clear()
     {
         if (peakList.isEmpty())
             return;
         this.peakList.clear();
+        resetScale();
         repaint();
     }
 
@@ -627,7 +635,7 @@ public class SpectrumChart extends Pane
             line.setStroke(color);
             getChildren().add(line);
 
-            String label = getAnnotationsLabel(annotations);
+            String label = SpectrumChartUtils.getAnnotationsLabel(annotations);
             Text labelText = new Text(label);
             labelText.setFont(config.getPeakLabelFont());
             labelText.setFill(color);
@@ -669,19 +677,6 @@ public class SpectrumChart extends Pane
 
                 getChildren().add(line);
             }
-        }
-    }
-
-    private String getAnnotationsLabel(List<? extends PeakAnnotation> annotations)
-    {
-        if (annotations.size() == 1) {
-            return annotations.get(0).getSymbol();
-        } else {
-            StringJoiner joiner = new StringJoiner(" ");
-            for (PeakAnnotation annotation : annotations) {
-                joiner.add(annotation.getSymbol());
-            }
-            return joiner.toString();
         }
     }
 }

@@ -23,6 +23,15 @@ public class PointLabel
     private final double height;
     private final double area;
 
+    /**
+     * Constructor
+     *
+     * @param point  point to be annotated
+     * @param pos    candidate {@link LabelPos}
+     * @param width  width of the label
+     * @param height height of the label
+     * @param space  space between label and the point
+     */
     public PointLabel(Point2D point, LabelPos pos, double width, double height, double space)
     {
         this.point = point;
@@ -142,9 +151,37 @@ public class PointLabel
                 linkX = maxLoc.getX();
                 linkY = maxLoc.getY();
                 break;
-            default:
+            case BOTTOM_LEFT1:
+            case BOTTOM_LEFT2:
+            case BOTTOM_LEFT3:
+            case BOTTOM_LEFT4:
+                linkX = maxLoc.getX();
+                linkY = minLoc.getY();
+                break;
+            case BOTTOM_RIGHT1:
+            case BOTTOM_RIGHT2:
+            case BOTTOM_RIGHT3:
+            case BOTTOM_RIGHT4:
+                linkX = minLoc.getX();
+                linkY = minLoc.getY();
+                break;
+            case TOP_CENTER1:
+            case TOP_CENTER2:
+            case TOP_CENTER3:
+            case TOP_CENTER4:
                 linkX = point.getX();
                 linkY = maxLoc.getY();
+                break;
+            case BOTTOM_CENTER1:
+            case BOTTOM_CENTER2:
+            case BOTTOM_CENTER3:
+            case BOTTOM_CENTER4:
+                linkX = point.getX();
+                linkY = minLoc.getY();
+                break;
+            default:
+                linkX = point.getX();
+                linkY = point.getY();
                 break;
         }
         return new Point2D(linkX, linkY);
@@ -188,27 +225,28 @@ public class PointLabel
 
     private static final int N = 3;
 
+
     /**
      * find suitable positions for all labels with Greedy Randomized Adaptive Search Procedure (GRASP) algorithm
      *
      * @param point2BoundsMap map from point to be label and the label size (width, height)
-     * @param space           space between labels and the to be labeled point.
+     * @param space           space between labels and the labeled point.
      * @param minX            minimum X allowed
      * @param minY            minimum Y allowed
      * @param maxX            maximum X allowed
      * @param maxY            maximum Y allowed
      */
-    public static HashMap<Point2D, PointLabel> placeLabelGrasp(Map<Point2D, Pair<Double, Double>> point2BoundsMap, double space,
-            double minX, double minY, double maxX, double maxY)
+    public static HashMap<Point2D, PointLabel> placeLabelGrasp(Map<Point2D, Pair<Double, Double>> point2BoundsMap,
+                                                               LabelPos[] candidatePoses, double space,
+                                                               double minX, double minY, double maxX, double maxY)
     {
         List<PointLabel> candidateList = new ArrayList<>();
-        LabelPos[] posArray = LabelPos.values();
         ArrayListMultimap<Point2D, PointLabel> candidateMap = ArrayListMultimap.create();
         for (Map.Entry<Point2D, Pair<Double, Double>> entry : point2BoundsMap.entrySet()) {
             Point2D key = entry.getKey();
             Pair<Double, Double> value = entry.getValue();
 
-            for (LabelPos pos : posArray) {
+            for (LabelPos pos : candidatePoses) {
                 PointLabel label = new PointLabel(key, pos, value.getFirst(), value.getSecond(), space);
                 Point2D minLoc = label.getMinLoc();
                 Point2D maxLoc = label.getMaxLoc();
@@ -291,6 +329,22 @@ public class PointLabel
         return map;
     }
 
+    /**
+     * find suitable positions for all labels with Greedy Randomized Adaptive Search Procedure (GRASP) algorithm
+     *
+     * @param point2BoundsMap map from point to be label and the label size (width, height)
+     * @param space           space between labels and the labeled point.
+     * @param minX            minimum X allowed
+     * @param minY            minimum Y allowed
+     * @param maxX            maximum X allowed
+     * @param maxY            maximum Y allowed
+     */
+    public static HashMap<Point2D, PointLabel> placeLabelGrasp(Map<Point2D, Pair<Double, Double>> point2BoundsMap, double space,
+                                                               double minX, double minY, double maxX, double maxY)
+    {
+        return placeLabelGrasp(point2BoundsMap, LabelPos.getTopPoses(), space, minX, minY, maxX, maxY);
+    }
+
 
     /**
      * find suitable positions for all labels, basic greedy algorithm.
@@ -303,7 +357,7 @@ public class PointLabel
      * @param maxY            maximum Y allowed
      */
     public static HashMap<Point2D, PointLabel> placeLabelAdvancedGreedy(Map<Point2D, Pair<Double, Double>> point2BoundsMap, double space,
-            double minX, double minY, double maxX, double maxY)
+                                                                        double minX, double minY, double maxX, double maxY)
     {
         List<PointLabel> candidateList = new ArrayList<>();
         LabelPos[] posArray = LabelPos.values();
@@ -382,7 +436,7 @@ public class PointLabel
      * @param maxY            maximum Y allowed
      */
     public static HashMap<Point2D, PointLabel> placeLabelSimpleGreedy(Map<Point2D, Pair<Double, Double>> point2BoundsMap, double space,
-            double minX, double minY, double maxX, double maxY)
+                                                                      double minX, double minY, double maxX, double maxY)
     {
         List<PointLabel> candidateList = new ArrayList<>();
         LabelPos[] posArray = LabelPos.values();

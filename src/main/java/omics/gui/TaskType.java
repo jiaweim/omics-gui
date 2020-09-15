@@ -26,7 +26,12 @@ public enum TaskType
     REFRESH,
     SETTING;
 
-    private final FontAwesome fontAwesome = new FontAwesome();
+    private static final FontAwesome fontAwesome = new FontAwesome();
+
+    public static Glyph getIcon(org.controlsfx.glyphfont.FontAwesome.Glyph glyph, int size)
+    {
+        return fontAwesome.create(glyph).size(size);
+    }
 
     /**
      * Return a icon for this task type.

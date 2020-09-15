@@ -7,9 +7,8 @@ import javafx.geometry.Bounds;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -33,6 +32,30 @@ import java.text.NumberFormat;
  */
 public class NodeUtils
 {
+    /**
+     * Open the context menu in given file
+     *
+     * @param file file
+     * @return a context menu
+     */
+    public static ContextMenu createMenu(File file)
+    {
+        ContextMenu menu = new ContextMenu();
+        MenuItem showExplorer = new MenuItem("Show in Explorer");
+        menu.getItems().add(showExplorer);
+
+        showExplorer.setOnAction(event -> {
+            File parentFile = file.getParentFile();
+            try {
+                Desktop.getDesktop().open(parentFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return menu;
+    }
+
     /**
      * for line with odd width, to have sharp border, its position should be half.
      *
@@ -180,6 +203,7 @@ public class NodeUtils
                     protected void updateItem(Object item, boolean empty)
                     {
                         super.updateItem(item, empty);
+
                         if (getTableRow() != null && item != null) {
                             setText(String.valueOf(getTableRow().getIndex() + 1));
                         } else {

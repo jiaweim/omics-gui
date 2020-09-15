@@ -15,7 +15,7 @@ import omics.gui.psm.util.NodeUtils;
 import omics.util.ms.peaklist.PeakAnnotation;
 import omics.util.ms.peaklist.PeakList;
 import omics.util.ms.peaklist.impl.DoublePeakList;
-import omics.util.protein.ms.PeptideFragAnnotation;
+import omics.util.protein.ms.PeptideFragmentAnnotation;
 import omics.util.utils.NumberFormatFactory;
 
 import java.text.NumberFormat;
@@ -90,7 +90,7 @@ public class SpectrumCanvas extends Canvas
     private double iUnitX;
     // intensity value per pixel
     private double iUnitY;
-    private SpectrumViewStyle config = new SpectrumViewStyle();
+    private PSMViewSettings config = new PSMViewSettings();
 
     private DoubleProperty iCurrentMz = new SimpleDoubleProperty();
     private DoubleProperty iCurrentIntensity = new SimpleDoubleProperty();
@@ -111,7 +111,7 @@ public class SpectrumCanvas extends Canvas
         draw();
     }
 
-    public SpectrumViewStyle getConfig()
+    public PSMViewSettings getConfig()
     {
         return config;
     }
@@ -334,8 +334,8 @@ public class SpectrumCanvas extends Canvas
                 List<? extends PeakAnnotation> annotations = peakList.getAnnotations(i);
                 PeakAnnotation annotation = annotations.get(0);
                 Color color = Color_DefaultAnno;
-                if (annotation instanceof PeptideFragAnnotation) {
-                    PeptideFragAnnotation fragAnnotation = (PeptideFragAnnotation) annotation;
+                if (annotation instanceof PeptideFragmentAnnotation) {
+                    PeptideFragmentAnnotation fragAnnotation = (PeptideFragmentAnnotation) annotation;
                     color = config.getColor(fragAnnotation.getIon());
                 }
 
