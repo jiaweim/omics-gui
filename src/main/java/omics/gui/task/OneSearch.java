@@ -96,7 +96,7 @@ public class OneSearch extends Task<Void>
         logger.info("Searching target");
         search(accessor, targetSequence, targetLenCount, targetPath);
 
-        if (parameters.isUseTDA()) {
+        if (parameters.isSearchDecoy()) {
             logger.info("Searching decoy");
             search(accessor, decoySequence, decoyLenCount, searchIOPath.getDecoyPath());
         }
@@ -166,11 +166,7 @@ public class OneSearch extends Task<Void>
                 List<SpectrumMatch> matches = future.get();
                 matchList.addAll(matches);
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            executor.shutdownNow();
-            System.exit(1);
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             executor.shutdownNow();
             System.exit(1);
@@ -226,7 +222,7 @@ public class OneSearch extends Task<Void>
             aaSet.registerEnzyme(protease.getEnzyme());
         }
 
-        if (parameters.isUseTDA()) {
+        if (parameters.isSearchDecoy()) {
             Path decoyDatabase = FilenameUtils.newExtension(database, DECOY_FASTA);
             if (Files.notExists(decoyDatabase)) {
                 DoShuffleDB shuffleDB = new DoShuffleDB(database, decoyDatabase, DoShuffleDB.DecoyType.REVERSE,

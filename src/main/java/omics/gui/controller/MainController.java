@@ -1,8 +1,6 @@
 package omics.gui.controller;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -128,7 +126,7 @@ public class MainController implements ShowAlert
 
         msFileListNode.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         msFileListNode.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue != null){
+            if (newValue != null) {
                 ContextMenu contextMenu = NodeUtils.createMenu(newValue);
                 msFileListNode.setContextMenu(contextMenu);
             }

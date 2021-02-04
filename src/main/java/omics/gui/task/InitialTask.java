@@ -86,7 +86,7 @@ public class InitialTask extends Task<InitialState>
         }
 
         updateProgress(70, 100);
-        if (parameters.isUseTDA()) {
+        if (parameters.isSearchDecoy()) {
             updateMessage("Initialize decoy database");
             Path decoyDatabase = FilenameUtils.newExtension(database, DoShuffleDB.DECOY_DB_EXT);
             if (Files.notExists(decoyDatabase)) {

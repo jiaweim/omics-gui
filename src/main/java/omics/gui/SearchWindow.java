@@ -35,8 +35,9 @@ public class SearchWindow extends Application
     @Override
     public void start(Stage primaryStage) throws Exception
     {
-        URL url = getClass().getClassLoader().getResource("fxml/main.fxml");
-        FXMLLoader loader = new FXMLLoader(url);
+        URL url = SearchWindow.class.getClassLoader().getResource("fxml/main.fxml");
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(url);
         Parent root = loader.load();
         MainController controller = loader.getController();
         controller.setMainWindow(primaryStage);

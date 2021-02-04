@@ -19,8 +19,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.textfield.TextFields?>
 
-
-<fx:root fitToWidth="true" type="ScrollPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root fitToWidth="true" type="ScrollPane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <content>
       <javafx.scene.layout.VBox prefHeight="800.0" prefWidth="760.0">
            <children>
@@ -36,12 +35,13 @@
                       <content>
                           <GridPane hgap="6.0" vgap="3.0">
                               <columnConstraints>
-                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="96.0" minWidth="96.0" prefWidth="96.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="80.0" minWidth="80.0" prefWidth="80.0" />
-                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="96.0" minWidth="96.0" prefWidth="96.0" />
-                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="80.0" minWidth="80.0" prefWidth="80.0" />
-                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="96.0" minWidth="96.0" prefWidth="96.0" />
-                                  <ColumnConstraints hgrow="ALWAYS" percentWidth="30.0" />
+                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="100.0" percentWidth="15.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="80.0" percentWidth="15.0" prefWidth="80.0" />
+                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="100.0" percentWidth="15.0" />
+                                  <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="80.0" minWidth="80.0" percentWidth="15.0" prefWidth="80.0" />
+                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="96.0" minWidth="96.0" percentWidth="15.0" prefWidth="96.0" />
+                                  <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
+                        <ColumnConstraints />
                               </columnConstraints>
                               <rowConstraints>
                                   <RowConstraints minHeight="24.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -71,19 +71,16 @@
                                   <ChoiceBox fx:id="missedCleavageNode2" prefWidth="88.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                                   <ChoiceBox fx:id="cleavageModeNode2" prefWidth="88.0" GridPane.columnIndex="3" GridPane.rowIndex="3" />
                                   <Label text="Fasta File" />
-                                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.columnSpan="4">
+                                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="1" GridPane.columnSpan="3">
                                       <children>
                                           <TextField fx:id="fastaField" prefWidth="300.0" />
                                           <Button fx:id="chooseFastaButton" mnemonicParsing="false" textAlignment="CENTER" />
                                       </children>
                                   </HBox>
-                                    <CheckBox fx:id="searchDecoyCheck" mnemonicParsing="false" selected="true" text="Search Decoy" GridPane.columnIndex="5" />
-                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="4.0" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="3">
-                           <children>
-                              <ComboBox fx:id="maxModNode" editable="true" prefWidth="66.0" />
-                           </children>
-                        </HBox>
+                                    <CheckBox fx:id="searchDecoyCheck" mnemonicParsing="false" selected="true" text="Search Decoy" GridPane.columnIndex="4" GridPane.rowIndex="1" />
                         <Label text="Max Modification" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                        <CheckBox fx:id="searchTargetCheck" mnemonicParsing="false" text="Search Target" GridPane.columnIndex="4" />
+                        <ComboBox fx:id="maxModNode" editable="true" prefWidth="66.0" GridPane.columnIndex="5" GridPane.rowIndex="3" />
                               </children>
                           </GridPane>
                       </content>
@@ -92,7 +89,7 @@
                       <content>
                           <GridPane hgap="6.0" vgap="3.0">
                               <columnConstraints>
-                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="108.0" minWidth="108.0" prefWidth="108.0" />
+                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="108.0" minWidth="120.0" prefWidth="108.0" />
                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="66.0" minWidth="66.0" prefWidth="66.0" />
                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="66.0" minWidth="66.0" prefWidth="66.0" />
                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="66.0" minWidth="66.0" prefWidth="66.0" />
@@ -139,7 +136,7 @@
                           </HBox>
                           <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="6.0" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="4">
                              <children>
-                                        <CheckBox fx:id="moreFeaturesNode" mnemonicParsing="false" prefWidth="100.0" selected="true" text="More Features" />
+                                        <CheckBox fx:id="moreFeaturesNode" mnemonicParsing="false" prefWidth="120.0" selected="true" text="More Features" />
                                         <CheckBox fx:id="preferDeltaNode" mnemonicParsing="false" prefWidth="100.0" selected="true" text="Prefer Delta" />
                              </children>
                           </HBox>

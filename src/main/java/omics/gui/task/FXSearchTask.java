@@ -111,7 +111,7 @@ public class FXSearchTask extends Task<Void>
             logger.info("Searching target");
             search(accessor, targetSequence, targetLenCount, targetPath);
 
-            if (parameters.isUseTDA()) {
+            if (parameters.isSearchDecoy()) {
                 logger.info("Searching decoy");
                 updateTitle("Search " + spectrumFile + " decoy");
                 search(accessor, decoySequence, decoyLenCount, searchIOPath.getDecoyPath());
@@ -176,11 +176,7 @@ public class FXSearchTask extends Task<Void>
                 List<SpectrumMatch> matches = future.get();
                 matchList.addAll(matches);
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            executor.shutdownNow();
-            System.exit(1);
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             executor.shutdownNow();
             System.exit(1);
@@ -250,7 +246,7 @@ public class FXSearchTask extends Task<Void>
             aaSet.registerEnzyme(protease.getEnzyme());
         }
 
-        if (parameters.isUseTDA()) {
+        if (parameters.isSearchDecoy()) {
             updateMessage("Creating decoy database");
             Path decoyDatabase = FilenameUtils.newExtension(database, IGD.DECOY_FASTA);
             if (Files.notExists(decoyDatabase)) {

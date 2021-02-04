@@ -1,13 +1,10 @@
 package omics.gui.control;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
@@ -17,7 +14,6 @@ import omics.gui.util.EnzymeStringConverter;
 import omics.gui.util.IntegerStringConverterV2;
 import omics.pdk.ident.SearchParameters;
 import omics.pdk.ident.model.*;
-import omics.util.chem.PeriodicTable;
 import omics.util.ms.Dissociation;
 import omics.util.ms.peaklist.Tolerance;
 import omics.util.protein.PeptideMod;
@@ -66,6 +62,8 @@ public class ParameterEditorPane extends ScrollPane
     @FXML
     private Button chooseFastaButton;
     @FXML
+    private CheckBox searchTargetCheck;
+    @FXML
     private CheckBox searchDecoyCheck;
     @FXML
     private ChoiceBox<Enzyme> enzymeNode;
@@ -84,7 +82,7 @@ public class ParameterEditorPane extends ScrollPane
      */
     @FXML
     private CheckBox nMChoose;
-//    @FXML
+    //    @FXML
 //    private ComboBox<Integer> isoformNode;
     @FXML
     private ComboBox<Integer> maxModNode;
@@ -238,7 +236,7 @@ public class ParameterEditorPane extends ScrollPane
         topN.setConverter(new IntegerStringConverter());
         topN.getItems().addAll(1, 5, 10);
 
-        instruNode.setConverter(new StringConverter<Instrument>()
+        instruNode.setConverter(new StringConverter<>()
         {
             @Override
             public String toString(Instrument object)
@@ -254,7 +252,7 @@ public class ParameterEditorPane extends ScrollPane
         });
         instruNode.getItems().addAll(Instrument.getAllRegisteredInstrumentTypes());
 
-        activationNode.setConverter(new StringConverter<Dissociation>()
+        activationNode.setConverter(new StringConverter<>()
         {
             @Override
             public String toString(Dissociation object)
@@ -270,7 +268,7 @@ public class ParameterEditorPane extends ScrollPane
         });
         activationNode.getItems().addAll(ScoreParam.getAllRegisteredDissociations());
 
-        protocolNode.setConverter(new StringConverter<Protocol>()
+        protocolNode.setConverter(new StringConverter<>()
         {
             @Override
             public String toString(Protocol object)
@@ -365,23 +363,18 @@ public class ParameterEditorPane extends ScrollPane
         });
 
         this.filterDeltaNode.setMaxWidth(160);
-        filterDeltaNode.textProperty().addListener(new ChangeListener<String>()
-        {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue)
-            {
-                if (StringUtils.isEmpty(newValue)) {
-                    deltaListNode.setItems(deltaList);
-                } else {
-                    ObservableList<Delta> subEntries = FXCollections.observableArrayList();
-                    String s = newValue.trim().toUpperCase();
-                    for (Delta item : deltaListNode.getItems()) {
-                        if (item.getName().toUpperCase().contains(s)) {
-                            subEntries.add(item);
-                        }
+        filterDeltaNode.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (StringUtils.isEmpty(newValue)) {
+                deltaListNode.setItems(deltaList);
+            } else {
+                ObservableList<Delta> subEntries = FXCollections.observableArrayList();
+                String s = newValue.trim().toUpperCase();
+                for (Delta item : deltaListNode.getItems()) {
+                    if (item.getName().toUpperCase().contains(s)) {
+                        subEntries.add(item);
                     }
-                    deltaListNode.setItems(subEntries);
                 }
+                deltaListNode.setItems(subEntries);
             }
         });
     }
@@ -395,7 +388,7 @@ public class ParameterEditorPane extends ScrollPane
         if (databaseFile != null) {
             fastaField.setText(databaseFile.toString());
         }
-        searchDecoyCheck.setSelected(parameters.isUseTDA());
+        searchDecoyCheck.setSelected(parameters.isSearchDecoy());
 
         Protease protease = parameters.getProtease();
         enzymeNode.setValue(protease.getEnzyme());
@@ -516,7 +509,7 @@ public class ParameterEditorPane extends ScrollPane
 
         Path fastaPath = Paths.get(fastaField.getText());
         parameters.setDatabase(fastaPath);
-        parameters.setUseTDA(searchDecoyCheck.isSelected());
+        parameters.setSearchDecoy(searchDecoyCheck.isSelected());
 
         parameters.setProtease(new Protease(firstEnzyme, missedCleavageNode.getSelectionModel().getSelectedItem(),
                 cleavageModeNode.getSelectionModel().getSelectedItem()));
