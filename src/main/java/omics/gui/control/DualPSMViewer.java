@@ -144,7 +144,8 @@ public class DualPSMViewer extends BorderPane implements ToolNode, ShowAlert
 
             AboutWindow aboutWindow = new AboutWindow(getToolName(), "1.0", BUILD_TIME,
                     "Dual PSM Viewer provides a top and bottom contrast view of spectra, which was originally " +
-                            "designed for the comparison visualization of light and heavy labeled methylated peptide spectrum. " +
+                            "designed for the comparison visualization of light and heavy labeled methylated peptide " +
+                            "spectrum. " +
                             "It can also be used for the comparison view of any other type of spectrum");
 
             PopOver popOver = new PopOver(aboutWindow);

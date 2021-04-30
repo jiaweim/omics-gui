@@ -458,8 +458,8 @@ public class PSMViewer extends BorderPane implements ToolNode, ShowAlert
                 return new ReadOnlyObjectWrapper<>("");
             });
 
-            ScoreFormatter formatter = score.getFormatter();
-            if (formatter instanceof DoubleScoreFormatter) {
+            if (score.isDouble()) {
+                ScoreFormatter<?> formatter = score.getFormatter();
                 NodeUtils.formatDoubleColumn(column, ((DoubleScoreFormatter) formatter).getNumberFormat());
             }
 

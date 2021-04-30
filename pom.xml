@@ -6,7 +6,7 @@
     <parent>
         <groupId>omics</groupId>
         <artifactId>omics</artifactId>
-        <version>1.12.0</version>
+        <version>1.12.3</version>
     </parent>
 
     <artifactId>omics-gui</artifactId>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>omics</groupId>
             <artifactId>omics-pdk</artifactId>
-            <version>6.35.5</version>
+            <version>6.37.10</version>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>

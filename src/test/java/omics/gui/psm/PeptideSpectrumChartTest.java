@@ -8,7 +8,7 @@ import omics.gui.psm.util.NodeUtils;
 import omics.msdk.io.MgfReader;
 import omics.pdk.IdentResult;
 import omics.pdk.ident.model.PeptideSpectrumMatch;
-import omics.pdk.io.MaxQuantEvidenceReader;
+import omics.pdk.io.MaxQuantEvidenceFile;
 import omics.pdk.psm.filter.ModificationFilter;
 import omics.util.OmicsException;
 import omics.util.chem.Composition;
@@ -21,7 +21,7 @@ import omics.util.ms.peaklist.impl.FloatPeakList;
 import omics.util.protein.AminoAcid;
 import omics.util.protein.Peptide;
 import omics.util.protein.mod.PTM;
-import omics.util.protein.mod.PTMResolver;
+import omics.util.protein.mod.PTMDecoder;
 import omics.util.protein.mod.Specificity;
 import omics.util.protein.ms.PeptideFragmentAnnotation;
 import omics.util.protein.ms.PeptideFragmentAnnotator;
@@ -72,12 +72,15 @@ class PeptideSpectrumChartTest extends Application
         Specificity r = new Specificity(AminoAcid.R);
         Specificity m = new Specificity(AminoAcid.M);
 
-        PTM methylPTM = new PTM("hM_monomethyl(KR)", Composition.parseComposition("H-1C[13]H[2]3"), Arrays.asList(k, r));
-        PTM methyl2PTM = new PTM("hM_dimethyl(KR)", Composition.parseComposition("H-2C[13]2H[2]6"), Arrays.asList(k, r));
-        PTM methyl3PTM = new PTM("hM_trimethyl(K)", Composition.parseComposition("H-3C[13]3H[2]9"), Collections.singletonList(k));
+        PTM methylPTM = new PTM("hM_monomethyl(KR)", Composition.parseComposition("H-1C[13]H[2]3"), Arrays.asList(k,
+                r));
+        PTM methyl2PTM = new PTM("hM_dimethyl(KR)", Composition.parseComposition("H-2C[13]2H[2]6"), Arrays.asList(k,
+                r));
+        PTM methyl3PTM = new PTM("hM_trimethyl(K)", Composition.parseComposition("H-3C[13]3H[2]9"),
+                Collections.singletonList(k));
         PTM hMPTM = new PTM("hM_M", Composition.parseComposition("H-3C-1C[13]H[2]3"));
 
-        PTMResolver resolver = new PTMResolver();
+        PTMDecoder resolver = new PTMDecoder();
         resolver.putOverrideUnimod("Oxidation (M)", PTM.Oxidation());
         resolver.putOverrideUnimod("Acetyl (Protein N-term)", PTM.Acetyl());
         resolver.putOverrideUnimod(methylPTM.getTitle(), methylPTM);
@@ -91,7 +94,8 @@ class PeptideSpectrumChartTest extends Application
 
         Scene scene = new Scene(newPane, 1200, 620);
 
-        MaxQuantEvidenceReader accessor = new MaxQuantEvidenceReader(Paths.get("Z:\\MaoJiawei\\Liuzhen-methylation results\\evidence-Bel-5-Fu1.csv"), resolver, null);
+        MaxQuantEvidenceFile accessor = new MaxQuantEvidenceFile(Paths.get("Z:\\MaoJiawei\\Liuzhen-methylation " +
+                "results\\evidence-Bel-5-Fu1.csv"), resolver, null);
         accessor.go();
         Set<String> modSet = new HashSet<>();
         modSet.add("hM_monomethyl(KR)");
