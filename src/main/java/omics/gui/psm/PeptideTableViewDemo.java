@@ -23,7 +23,7 @@ import java.util.Map;
  * @version 1.0.0
  * @since 22 May 2020, 12:17 PM
  */
-class PeptideTableViewTest extends Application
+public class PeptideTableViewDemo extends Application
 {
     public static void main(String[] args)
     {
